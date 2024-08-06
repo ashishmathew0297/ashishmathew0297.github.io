@@ -2,7 +2,7 @@
 # Site settings
 # -----------------------------------------------------------------------------
 
-title: blank # the website title (if blank, full name will be used instead)
+title: Welcome to Me # the website title (if blank, full name will be used instead)
 first_name: Ashish
 middle_name: Thomas
 last_name: Mathew
@@ -242,7 +242,7 @@ exclude:
   - lighthouse_results/
   - package.json
   - package-lock.json
-  - _pages/about_einstein.md
+  - _pages/about_ashish.md
   - purgecss.config.js
   - README.md
   - readme_preview/
