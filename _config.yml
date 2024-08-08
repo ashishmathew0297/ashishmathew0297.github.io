@@ -54,7 +54,7 @@ socials_in_search: true
 bib_search: true
 
 # Dimensions
-max_width: 930px
+max_width: 950px
 
 # TODO: add layout settings (single page vs. multi-page)
 
@@ -133,7 +133,7 @@ bing_site_verification: # out your bing-site-verification ID (Bing Webmaster)
 # -----------------------------------------------------------------------------
 
 blog_name: My Blog # blog_name will be displayed in your blog page
-blog_description: a run-down of all my learnings during my data science journey
+blog_description: my learnings and thought processes as a developer, an aspiring data scientist and a human being
 permalink: /blog/:year/:title/
 lsi: false # produce an index for related posts
 
@@ -304,7 +304,7 @@ jekyll-archives:
     tag: "/blog/tag/:name/"
     category: "/blog/category/:name/"
 
-display_tags: ["machine Learning","Deep Learning", "Computer Vision", "Natural Language Processing", "Generative AI"] # these tags will be displayed on the front page of your blog
+display_tags: ["python", "machine-learning", "deep-learning", "computer-vision", "NLP", "genAI"] # these tags will be displayed on the front page of your blog
 display_categories: [] # these categories will be displayed on the front page of your blog
 
 # -----------------------------------------------------------------------------

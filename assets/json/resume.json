@@ -1,12 +1,12 @@
 {
   "basics": {
     "name": "Ashish Thomas Mathew",
-    "label": "Data Scientist",
+    "pronouns": "he/him",
     "image": "",
     "email": "ashishmathew2002@gmail.com",
     "phone": "(774) 365-8188",
     "url": "https://github.com/ashishmathew0297",
-    "summary": "An Indian-born Data Science student with a keen interest in Artificial Intelligence, robotics and everything computers.",
+    "summary": "An Indian-born Data Science student with a keen interest in Artificial Intelligence, robotics and everything computer science.",
     "location": {
       "address": "285 Old Wetport Road",
       "postalCode": "MA 02747",
@@ -29,8 +29,13 @@
       "url": "",
       "startDate": "2019-07-29",
       "endDate": "2022-07-01",
-      "summary": "A highly motivated software developer who successfully developed AI-driven applications to tackle complex problems in computer vision, object detection and Natural Language Processing. I excelled at building scalable AI solutions that address real-world challenges and demonstrated a high amount of adaptability to new technologies and work environments.",
-      "highlights": ["Web-application Development", "Data Analysis", "Deep Learning", "Machie Learning", "Interpersonal Communication", "Cloud Computing"]
+      "summary": "A highly motivated software developer who successfully developed AI-driven solutions to tackle complex problems in computer vision, object detection and Natural Language Processing.",
+      "highlights": [
+        "Developed and maintained fully-featured single-page applications in Angular and Django for a fintech client.",
+        "Prepared comprehensive reports and real-time visualizations to communicate findings to the research team and stakeholders.",
+        "Built and deployed CI/CD pipelines for rapid application test and deployment processes, improving the deployment speed by 80%.",
+        "Ensured robustness of developed systems by troubleshooting and debugging complex technical issues.",
+        "Provided technical support for clients, assisting with resolving software issues via phone, email and live chat."]
     }
   ],
   "volunteer": [
@@ -42,7 +47,7 @@
       "startDate": "2018-08-01",
       "endDate": "2019-03-01",
       "summary": "Lead organizer for events in the city to help address some of the world's pressing challenges on a smaller scale through the UNs sustainable goals.",
-      "highlights": [""]
+      "highlights": []
     }
   ],
   "education": [
@@ -158,12 +163,12 @@
   ],
   "projects": [
     {
-      "name": "Quantum Computing",
-      "summary": "Quantum computing is the use of quantum-mechanical phenomena such as superposition and entanglement to perform computation. Computers that perform quantum computations are known as quantum computers.",
-      "highlights": ["Quantum Teleportation", "Quantum Cryptography"],
-      "startDate": "2018-01-01",
-      "endDate": "2018-01-01",
-      "url": "https://example.com"
+      "name": "Multithreaded Implementation of Floyd-Steinberg Dithering",
+      "summary": "Implemented and studied the performance of the Floyd-Steinberg Dithering Algorithm with multithreading to study its performance in comparison to its single threaded implementation.",
+      "highlights": ["C++", "OpenCV", "Python", "Bash"],
+      "startDate": "2023-08-30",
+      "endDate": "2023-09-30",
+      "url": "https://github.com/ashishmathew0297/floyd-steinberg-dithering"
     }
   ]
 }
