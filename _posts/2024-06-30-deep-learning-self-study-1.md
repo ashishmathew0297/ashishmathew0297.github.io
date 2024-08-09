@@ -23,7 +23,7 @@ This post focuses on the basics of deep learning and neural networks with a focu
 
 In the world of data science{% cite coursera2024 %}, we usually see mentions of statistics, machine learning (ML), artificial intelligence (AI), and deep learning several times. Though machine learning and deep learning are both subfields of AI and both terms are used interchangeably, they have their own meanings.
 
-**Machine learning** algorithms adapt to the data provided to them with minimal human interference to either find patterns or make decisions on newly provided data.
+**Machine learning** algorithms are relatively simple models designed to adapt on input data and either find patterns or make decisions on newly provided data.
 
 **Deep learning** on the other hand, is a branch of machine learning that involves training expansive *artificial neural networks (ANNs)*. An ANN consists of layers of interconnected nodes called *neurons* that, together, help process and learn patterns from the input.
 
@@ -38,7 +38,7 @@ Deep learning has not only transformed how we search for content on the internet
 
 ## Neural Networks
 
-The basic idea of deep learning is the training of **Neural Networks**. The best way to understand what a neural network is, is to through a real-life example. Suppose we have a housing price prediction model where the data at hand consists of the square-foot size of the houses and their prices.
+The basic idea of deep learning is the training of **Neural Networks**. The best way to understand what a neural network is, is to through a real-life example. Suppose we have a housing price prediction model where the data at hand consists of the square-foot size of the houses and their prices. Using basic machine learning, the logical next step to take here would be
 
 ## Supervised Learning with Neural Networks
 
@@ -62,7 +62,7 @@ The basic idea of deep learning is the training of **Neural Networks**. The best
 
 ## Backpropagation in a Two-layer Neural Network
 
-
+## Summary
 
 <!--####
 
