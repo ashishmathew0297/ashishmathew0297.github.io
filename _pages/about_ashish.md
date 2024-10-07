@@ -1,0 +1,3 @@
+Hi! I'm Ashish, a Data Science Master's student at the University of Massachusetts Dartmouth. I have a background in electrical engineering and software development. I excel in developing enterprise AI based web applications and have worked on several projects in robotics and machine learning on the side.
+
+My interests include Medical AI, robotics, and natural language processing. When I'm not locked in, I nerd out over retro technology, music, gaming and art.
