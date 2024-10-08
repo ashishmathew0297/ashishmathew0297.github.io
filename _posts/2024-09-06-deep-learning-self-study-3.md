@@ -1110,35 +1110,37 @@ This network has a total of $$138,000,000$$ parameters.
 
 # Residual Networks (ResNets)
 
-When training deep neural networks, the problem of vanishing and exploding gradients is one of the biggest issues that one faces. I'd highly suggest looking back at the [previous blog]({{site.baseurl}}{% link _posts/2024-07-22-deep-learning-self-study-2.md %}) to recap on what these problems pose.
+When training a deep neural network the training is much slower as opposed to shallow networks.
 
-However, to save you the time of going through that blog, the basic idea is that as we train a neural network, going through several layers of activations, the output values can either grow or shrink exponentially due to the weight matrices being scaled slightly smaller or larger with each layer that is passed, leading to a lot of performance issues when training the network.
+Imagine we have to train a neural network on a large amount of data.{% cite BryceResNets %} When initializing the network, we know that the weights are randomly initialized, and as the inputs are fed into each layer, they are multiplied with these randomly generated weights and fed into activations. This is done several times such that towards the output layers, we get random noise as none of the information we receive is related to the input.
 
-Weight initialization is one method of mitigating this issue as had been discussed before, but this can only help so much. As the depth and complexity of neural networks go into the several hundreds, it can get difficult to avoid these issues even with proper weight initialization strategies.
+Now, when going through the backpropagation process, we compute the loss on the output and propagate it back through the network. We yet again face the same issue as before as the loss value later into the network do not inform the layers much about the inputs as their own inputs are noise. Hence, the gradients are also effectively scrambled and propagate noise back towards the input layers, even compounding it due to multiplications with weight matrices.
+
+This leads to a lot of problems when training the network as the backprop algorithm struggles to learn from the inputs. In addition the problem here isn't even something like overfitting which would have been diagnosed easily. 
 
 This is where **Residual Networks** or **ResNets** come into the picture.
 
-ResNets {% cite BruntonResNets %} are one of the most important deep neural network architectures in the modern day. They find uses in several fields like image classification and ordinary differential equations
+ResNets {% cite BruntonResNets %} are one of the most important deep neural network architectures in the modern day. They find uses in several fields like image classification and ordinary differential equations. They are also one of the main ingredients used in transformers, which find use in large language models such as ChatGPT.
 
-They introduce the idea of implementing a **skip connection**. This is done by taking the activations of a layer and feeding them to a layer later down the line alongside the already existing activations from the previous layer. This is what helps us build deeper neural networks.
+The main idea here is to create a way for data to arrive at later layers, hence making their inputs more meaningful, and also for loss gradients and their updates to have some meaning.
+
+This is done by introducing the idea of **skip connections** which allow for data to be propagated deeper into the network.
 
 ## The Residual Block
 
-ResNets are built upon a **residual block** which we will be discussing now.
+ResNets are built upon a **residual block**, where a few layers of the network are grouped up into blocks, and the input activations of these blocks are both fed through each of its layers and also around it.
 
 Consider a neural network modelling an input/output function with inputs $$x$$ and outputs $$y$$. The relationships can be shown as
 
 $$y = f(x)$$
 
-In resnets, instead of trying to learn the direct relationship mapping, we create a copy of the input $$x$$ and only model the difference between them and $$y$$ given as
+In ResNets, instead of trying to learn the direct relationship mapping, we create a copy of the input $$x$$ and only model the difference between them and $$y$$ given as
 
 $$y = x + f(x)$$
 
-This is because most of the features in the output $$y$$ is already present in the input and there is a small residual $$f(x)$$ capturing all the little features in the input
+This is because most of the features in the output $$y$$ is already present in the input and there is a only a small part in the form of the residual $$f(x)$$ capturing all the features in the input.
 
-Usually as we traverse down very deep neural network, it becomes hard to remember the original input $$x$$ over many layers. In many cases the output is similar to $$x$$ so it is important that it is not forgotten. ResNets help us train much deeper networks without forgetting the inputs at the final stages.
-
-Here the residual refers to the minute changes that occur to the inputs as one traverses down the network as opposed to the whole feature itself.
+Here the **residual** refers to the minute changes that occur to the inputs as one traverses down the network as opposed to the whole feature itself.
 
 Consider the layers below taken from a several layer deep neural network.
 
@@ -1178,11 +1180,9 @@ A slightly more explicit look into this would be something like
     </div>
 </div>
 
-This effectively allows the data to follow two different paths, allowing the information to skip several layers and find use in deeper parts of the neural network.
+Now, the skip connections here give the data two paths to follow, one through the block and one skipping these intermediate layers and finding use deeper in the network.
 
-This essentially helps train deeper neural networks without without forgetting what the original inputs are towards the final stages of the network.
-
-Here, the latest activation acts as a residual added on to the previous information, and we focus on only modelling these residuals which capture the changes from the inputs and outputs of the residual layer. 
+This essentially helps train deeper neural networks without forgetting what the original inputs are towards the final stages of the network.
 
 ResNets are built using several residual blocks, stacked together to form a deep network
 
@@ -1198,11 +1198,15 @@ ResNets are built using several residual blocks, stacked together to form a deep
     A neural network made with plain connections and a residual network with skip connections.
 </div>
 
-When adding residual connections, they can either be **added** or **concatenated** with the linear part such that it forms a single tensor.
+The outputs of the block are combined with the input to the block in the form of a simple function that passes gradients along undisturbed by either
+- **Adding** the tensor of inputs and tensor of outputs element-wise.
+- **Concatenating** the tensors
 
-In theory, as the neural networks get deeper, they should perform better on the training set. However, in practice, deep networks cause the optimization algorithm to struggle to train, hence leading to a rise in training error. ResNets help mitigate this, allowing the training error to keep going down as the network is trained.
+Here, the latest activation acts as a residual added on to the previous information passed by the skip layer. We only focus on only modelling these residuals which capture the changes from the inputs and outputs of the residual layer. 
 
-By taking activations from the inputs and earlier layers of the network and allowing them to influence layers deeper into the neural network, the vanishing and exploding gradient problems are mitigated, hence allowing deeper networks to be trained. We will now look at why this works.
+<!-- In theory, as the neural networks get deeper, they should perform better on the training set. However, in practice, deep networks cause the optimization algorithm to struggle to train, hence leading to a rise in training error. ResNets help mitigate this, allowing the training error to keep going down as the network is trained. -->
+
+<!-- By taking activations from the inputs and earlier layers of the network and allowing them to influence layers deeper into the neural network, the vanishing and exploding gradient problems are mitigated, hence allowing deeper networks to be trained. We will now look at why this works. -->
 
 ## How ResNets Work
 
@@ -1210,9 +1214,19 @@ Consider a plain network as shown with $$X$$ being the inputs to a big neural ne
 
 $$X \rightarrow \boxed{\text{Big NN}} \rightarrow a^{[l]}$$
 
-Consider two more layers to be added to it along with a skip connection to make it deeper.
+Consider two more layers to be added to it , making it deeper.
 
 $$X \rightarrow \boxed{\text{Big NN}} \xrightarrow{a^{[l]}} \text{layer }[l+1] \rightarrow \text{layer }[l+2] \rightarrow a^{[l+2]}$$
+
+According to the ResNets {% cite DBLP:journals/corr/HeZRS15 %} paper, there exists a solution *by construction* to the deeper model
+
+The added layers are *identity mapping* and the other layers are copying from the learned shallower model.
+
+The idea is that if we have a shallower model learning a function, we should also be able to train a deeper model to learn the same function by copying the original five layers and using the additional layers to learn the identity function.
+
+However, the plain model does not learn the identity function because most of the weights are initialiized close to zero, hence causing any sort of regularization to bias the weights towards zero.
+
+Now, consider adding a skip connection from $$a^{[l]}$$ to $$layer[l+2]$$
 
 The final ReLU activation which has outputs such that $$a \geq 0$$, is now changed such that
 
@@ -1223,10 +1237,22 @@ a^{[l+2]} &= g(Z^{[l+2]} + a^{[l]}) \\
 \end{align*}
 $$
 
-Now, if we use L2 regularization for weight decay in this function, $$W^{[l+2]}$$ is shrunk. Hence, if the weight and bias at $$[l+2]$$ are zero, we get
+Now, if we use L2 regularization for weight decay in this function, $$W^{[l+2]}$$ is shrunk doen to zero. Hence, if the weight and bias at $$[l+2]$$ are zero, we end up woth
 
 $$a^{[l+2]} = g(a^{[l]}) = a^{[l]}$$
 
 when using ReLU activations.
 
-In this case, we see that the identity function is easy for our residual blocks to train on, hence making it so that adding the additional layers will not have as much of an impact on the neural network's ability to learn.
+Here, we see that instead of being biased to zero, the function just reverts back to the value of the previous inputs, which are the identity function here.
+
+Hence, the idea of identity functions makes it easy for our residual blocks to train, making it so that adding the additional layers to the network will not have as much of an impact on its ability to learn.
+
+#### Note
+
+When building ResNets it is assumed that the dimensions of the skip connection and the output of the residual block have the same dimension.
+
+Hence, we **must** use same convolutions in the residual network to ensure the same input and output dimensions.
+
+In the occasion that the dimensions are different, we must add a matrix $$W_{s}$$ to transform the dimensions of the output to be the same as the input.
+
+Here, $$W_{s}$$ can be a set of parameters to be learned or a matrix that implements zero padding.
