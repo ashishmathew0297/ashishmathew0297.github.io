@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Deep Learning - Basics of Computer Vision
+title: Deep Learning - Basics of Computer Vision (ConvNets)
 date: 2024-09-06 18:49:00
 description: "Topics covered: Convolutional Neural Network Foundations, Case Studies, Object Detection, Special applications (Face Recognition and Neural Style Transfer)."
 tags: machine-learning deep-learning computer-vision
@@ -1251,8 +1251,142 @@ Hence, the idea of identity functions makes it easy for our residual blocks to t
 
 When building ResNets it is assumed that the dimensions of the skip connection and the output of the residual block have the same dimension.
 
-Hence, we **must** use same convolutions in the residual network to ensure the same input and output dimensions.
+Hence, we **must** use same convolutions in the residual network with $$1 \times 1$$ strides to ensure the same input and output dimensions.
 
 In the occasion that the dimensions are different, we must add a matrix $$W_{s}$$ to transform the dimensions of the output to be the same as the input.
 
 Here, $$W_{s}$$ can be a set of parameters to be learned or a matrix that implements zero padding.
+
+If we also want to match up the number of channels, we use $$1 \times 1$$ convolutions. 
+
+## Advantages of ResNets
+
+#### Skip blocks augment the existing data
+
+As the skip connection passes the input down to the later layers of the neural network, the main network can focus on figuring out what information it has to add on top of the inputs as opposed to the whole input itself. This makes subsequent processing easier.
+
+- If we are concatenating the inputs, it is passed through unchanged along with the outputs. If added, the value being sent is mostly unchanged as the weights are centered around zero.
+- As a result of this each block learns a simpler task and has better access to information to learn from.
+
+#### Shorter gradient paths
+
+Due to skip connections, the gradients have shorter paths to follow to get to each layer of the network. This is because each block has one path going through each of the layers and one path around them, and the gradients go back through both of them. Hence, any layer in the network will have a shorter path which the loss gradients can arrive to and usefully update the given layer's computation
+
+-  As a result, in the initial epochs when the training results are not informative, we can still get useful updates from the shorter paths and obtain decreasing loss right away.
+- In addition, over time, as the later blocks in the network start computing more useful functions, the information along the direct path becomes more informative, hence leading to a continued decrease in the gradients, outperforming the plain network.
+- To sum it up, this leads to **faster training**.
+
+#### Modularity
+
+An additional advantage that ResNets have is modularity. Since each of the blocks have similar structures, we can short circuit around blocks during training, making it easier to add more blocks and deepen the network.
+
+- Most papers have variations on the same network with different numbers of blocks with different tradeoffs between the resources needed to train and the resulting model's predicting power.
+
+## Concerns
+
+#### Shape Mismatch
+
+If we want to combine the inputs and outputs of a ResNet, we need to ensure that the input and output shapes match up. For normal activation layers like dense networks, we might end up with different numbers of neurons per layer.
+
+Hence, when adding the inputs to the outputs of the first block, we need an operation to reshape the inputs or only add the inputs to a part of the block's output.
+
+With ConvNets, we will have to ensure that the height and width of the convolutional layers can be combined with the input height and width.
+
+#### Parameter Explosion
+
+Another concern with ResNets is that with repeated concatenation at the output blocks, we can get a large activation tensor, hence leading to an explosion in the number of parameters. To counteract this, we prefer using addition to concatenation with matching input shapes.
+
+# Shape Matching Convolutional blocks
+
+A lot of implementations of ConvNets require for us to ensure that the output shapes of convolutional blocks are in a particular shape. One way to ensure this is to use $$1 \times 1$$ strides and same padding to ensure the width and height of the image are preserved.
+
+However, if we want to match up the number of channels, we use $$1 \times 1$$ convolutions.
+
+# $$1 \times 1$$ Convolutions (Networks in Networks)
+
+$$1 \times 1$$ convolutions are useful when designing ConvNet architectures.
+
+A $$1 \times 1$$ filter would be something like
+
+$$
+\begin{bmatrix}
+1 & 2 & 3 & 6 & 5 & 8 \\
+3 & 5 & 5 & 1 & 3 & 4 \\
+2 & 1 & 3 & 4 & 9 & 3 \\
+4 & 7 & 8 & 5 & 7 & 9 \\
+1 & 5 & 3 & 7 & 4 & 8 \\
+5 & 4 & 9 & 8 & 3 & 5 \\
+\end{bmatrix}
+*
+\begin{bmatrix}
+2
+\end{bmatrix}
+= 
+\begin{bmatrix}
+2 & 4 & 6 & \dots & &  \\
+ \\
+ \\
+ \\
+ \\
+ \\
+\end{bmatrix}
+$$
+
+Here we are effectively multiplying every pixel of the give image` by $$2$$.
+
+For a $$6 \times 6 \times 32$$ image, the filter goes through each of the $$36$$ pixels of the image, taking the element-wise product with the $$32$$ pixels in the same position along the channels, hence giving us a real number output to which we apply our non-linearities.
+
+This is equivalent to a single neuron with $$32$$ nodes, multiplying each of them in place with $$32$$ weights, adding them up and applying our non-linearity to them.
+
+For multiple filters. it is equivalent to having multiple units, taking all the numbers in a slice and building them up to an output.
+
+This is called a $$1 \times 1$$ convolution or network in network.
+
+### Alternate explanation
+
+Using a $$1 \times 1$$ kernel on a multi-channel input gives an output block with the same height and width as the input. Each neuron in the output receives inputs from just one pixel of the input but also receives information from the entire depth of the particular channel it is pointed to.
+
+Setting the number of filters helps us specify the depth of the output, and each neuron of the output can gets its inputs from the neurons across the depth of the previous layer. This is similar to adding a single dense layer to make the input and output shapes match up.
+
+## Uses of $$1 \times 1$$ convolutions
+
+Consider the given case below
+
+$$28 \times 28 \times 192 \xrightarrow[CONV 1 \times 1 \;\; (32)]{ReLU} 28 \times 28 \times 32$$
+
+To shrink the height and width of the volume above we would normally use a pooling layer, but we have no straightforward way to reduce the number of channels.
+
+Hence, in this case, to shrink the number of filters down to $$32$$, we use $$32$$ $$1 \times 1$$ filters with each filter having a dimensions of $$1 \times 1 \times 192$$. This wil effectively result in shrinking the number of layers down to $$28 \times 28 \times 32$$, hence helping save on computations in the networks.
+
+The network in network effect is the addition of a non-linearity, allowing the learning of more complex functions by adding yet another layer.
+
+# Inception Networks
+
+Consider us building a neural network from scratch. We would pick our layers in the form of convolution filters of varying dimensions or pooling layers.
+
+An **inception network** does the job of all of the discussed layers til now while making the network architecture more complicated and performing well.
+
+Inception networks were developed by Google with the initial name of GoogleNet. Its name is inspired by the "We need to go deeper" meme from the movie Inception, and the meme is actually referenced in the paper, which is pretty funny.
+
+Consider the case of a $$28 \times 28 \times 192$$ input. In an inception layer we do all of the operations at once.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-12 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/inception_example.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+    An Inception layer
+</div>
+
+In the image above the inception network is performing the following operations
+- A $$1 \times 1$$ convolution to give a $$28 \times 2 \times 64$$ output.
+- A $$3 \times 3$$ same convolution to give a $$28 \times 28 \times 128$$ output.
+- A $$5 \times 5$$ same convolution to give a $$28 \times 28 \times 32$$ output.
+- A max pooling layer with padding to give us a $$28 \times 28 \times 32$$ output.
+
+All of these are stacked one on top of the other to give us a composite output of dimensions $$28 \times 28\times 256$$.
+
+The idea of an inception network is to be a swiss army knife to which we can put in our inputs to obtain the outputs exactly as per our needs. This network performs all the operations needed at once and concatenates them, allowing the network to learn the parameters to use alongside the filter sizes and pools needed.
+
+The main drawback of inception layers is the **computation cost**.
