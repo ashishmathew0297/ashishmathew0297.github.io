@@ -14,7 +14,7 @@ pretty_table: true
 
 Simple Artificial Neural Networks (ANNs), though powerful by themselves face a hard limit to how effective they can be when working with specialized domains such as computer vision, speech recognition and so on. Such implementations require completely different architectures, concepts and implementations, and, as has been discussed before, intuitions for these domains do not always cross pollinate.
 
-This blog will cover one such domain that has been of great interest to me for the longest time: **Computer Vision**. A lot of the content of this blog is based off papers written by the original authors with the main structure of the blog being highly inspired by the [Convolutional Neural Networks](https://www.coursera.org/learn/convolutional-neural-networks?specialization=deep-learning) portion of the [Deep Learning Specialization](https://www.coursera.org/specializations/deep-learning) by Andrew Ng. The images in this blog were either made by hand, in [draw.io](https://app.diagrams.net/) or were generated through python. Without wasting any more time, let's begin.
+This blog will cover one such domain that has been of great interest to me for the longest time: **Computer Vision**. A lot of the content of this blog is based off papers written by the original authors with the main structure of the blog being highly inspired by the [Convolutional Neural Networks](https://www.coursera.org/learn/convolutional-neural-networks?specialization=deep-learning) portion of the [Deep Learning Specialization](https://www.coursera.org/specializations/deep-learning) by Andrew Ng. The images in this blog were either made by hand, in [draw.io](https://app.diagrams.net/), taken from their respective research papers, or were generated through python. Without wasting any more time, let's begin.
 
 <hr>
 
@@ -934,6 +934,10 @@ $$
 
 Pooling has **no parameters to learn**. It is a **fixed function** that the neural network applies to the input layers.
 
+##### A concern with respsct to pooling
+
+Max-pooling layers can result in the loss of accurate spacial information.
+
 ## Why are convolutions used?
 
 If we were to work with an image of dimensions $$32 \times 32 \times 3$$ implementing $$6$$ filters on it, this would give us a $$28 \times 28 \times 6$$ output.
@@ -1001,7 +1005,7 @@ The LeNet-5 architecture was trained on digitized $$32 \times 32$$ greyscale ima
 
 The main architecture of LeNet-5 is given below. Here, consider $$Cx$$ to be a convolutional layer, $$Sx$$ to be a pooling/subsampling layer and $$Fx$$ to be a fully connected layer. $$x$$ here refers to the layer index. While the original paper used average pooling for the sampling layers, the more modern variants of this architecture use max pooling.
 
-| Layer          | Inputs         | No. of Filters | Kernel/layer Size | Stride | Activation          | Outputs    |
+| Layer          | Inputs         | No. of Filters | Kernel Size | Stride | Activation          | Outputs    |
 | -------------- | -------------- | -------------- | ----------------- | ------ | ------------------- | ---------- |
 | C1             | (32,32,1)      | 6              | 5                 | 1      | Sigmoid             | (28,28,6)  |
 | S2 (Max pool)  | (28,28,6)      | 1              | 2                 | 2      | --                  | (14,14,6)  |
@@ -1038,7 +1042,7 @@ This architecture here resembles LeNet-5 to a certain extent but has a significa
 
 The network architecture is as follows
 
-| Layer            | Inputs           | No. of Filters | Kernel/layer Size | Stride | Activation          | Outputs     |
+| Layer            | Inputs           | No. of Filters | Kernel Size | Stride | Activation          | Outputs     |
 | ---------------- | ---------------- | -------------- | ----------------- | ------ | ------------------- | ----------- |
 | C1               | (227,227,3)      | 96             | 11                | 4      | ReLU                | (55,55,96)  |
 | S2 (Max pool)    | (55,55,96)       | 1              | 3                 | 2      | --                  | (27,27,96)  |
@@ -1080,7 +1084,7 @@ This network is well known for having a much simpler architecture with a focus o
 
 The architecture here is as follows
 
-| Layer            | Inputs            | No. of Filters | Kernel/layer Size | Stride | Activation          | Outputs       |
+| Layer            | Inputs            | No. of Filters | Kernel Size | Stride | Activation          | Outputs       |
 | ---------------- | ----------------- | -------------- | ----------------- | ------ | ------------------- | ------------- |
 | C1 (Same Conv.)  | (224,224,3)       | 64             | 3                 | 1      | ReLU                | (224,224,64)  |
 | C2 (Same Conv.)  | (224,224,64)      | 64             | 3                 | 1      | ReLU                | (224,224,64)  |
@@ -1140,7 +1144,7 @@ $$y = x + f(x)$$
 
 This is because most of the features in the output $$y$$ is already present in the input and there is a only a small part in the form of the residual $$f(x)$$ capturing all the features in the input.
 
-Here the **residual** refers to the minute changes that occur to the inputs as one traverses down the network as opposed to the whole feature itself.
+Here, the **residual** refers to the *minute changes* that occur to the inputs as one traverses down the network as opposed to the whole feature itself.
 
 Consider the layers below taken from a several layer deep neural network.
 
@@ -1220,30 +1224,54 @@ $$X \rightarrow \boxed{\text{Big NN}} \xrightarrow{a^{[l]}} \text{layer }[l+1] \
 
 According to the ResNets {% cite DBLP:journals/corr/HeZRS15 %} paper, there exists a solution *by construction* to the deeper model
 
-The added layers are *identity mapping* and the other layers are copying from the learned shallower model.
+The added layers are *"identity mapping"* and the other layers are copying from the learned shallower model which is acting as the "identity" here.
 
-The idea is that if we have a shallower model learning a function, we should also be able to train a deeper model to learn the same function by copying the original five layers and using the additional layers to learn the identity function.
+Now, considering a skip connection from $$a^{[l]}$$ to $$layer[l+2]$$, we compare the equations for both cases 
 
-However, the plain model does not learn the identity function because most of the weights are initialiized close to zero, hence causing any sort of regularization to bias the weights towards zero.
-
-Now, consider adding a skip connection from $$a^{[l]}$$ to $$layer[l+2]$$
-
-The final ReLU activation which has outputs such that $$a \geq 0$$, is now changed such that
-
+<table>
+<tr>
+<th> Plain Neural Network </th>
+<th> ResNet </th>
+</tr>
+<tr>
+<td>
 $$
 \begin{align*}
-a^{[l+2]} &= g(Z^{[l+2]} + a^{[l]}) \\
-&= g(W^{[l+2]}a^{[l+1]} + b^{[l+2]} + a^{[l]})
+Z^{[l]} &= W^{[l]}A^{[l-1]} + b^{[l]} \\
+A^{[l]} &= g(Z^{[l]}) \\
+Z^{[l+1]} &= W^{[l+1]}A^{[l]} + b^{[l+1]} \\
+A^{[l+1]} &= g(Z^{[l+1]}) \\
+Z^{[l+2]} &= W^{[l+2]}A`^{[l+1]} + b^{[l+1]} \\
+A^{[l+2]} &= g(Z^{[l+2]}) \\
 \end{align*}
 $$
+</td>
+<td>
+$$
+\begin{align*}
+Z^{[l]} &= W^{[l]}A^{[l-1]} + b^{[l]} \\
+A^{[l]} &= g(Z^{[l]}) \text{ (Skip connection created)}\\
+Z^{[l+1]} &= W^{[l+1]}A^{[l]} + b^{[l+1]} \\
+A^{[l+1]} &= g(Z^{[l+1]}) \\
+Z^{[l+2]} &= W^{[l+2]}A^{[l+1]} + b^{[l+1]} \text{ (Skip connection added)}\\
+A^{[l+2]} &= g(Z^{[l+2]} + A^{[l]})
+\end{align*}
+$$
+</td>
+</tr>
+</table>
 
-Now, if we use L2 regularization for weight decay in this function, $$W^{[l+2]}$$ is shrunk doen to zero. Hence, if the weight and bias at $$[l+2]$$ are zero, we end up woth
+<br>
 
-$$a^{[l+2]} = g(a^{[l]}) = a^{[l]}$$
+If some amount of regularization or weight decay was applied here, the values of $$Z^{[l+2]}$$ would shrink down to zero or values close to zero. The effects of this would have are:
 
-when using ReLU activations.
+- For the plain model, the output activation $$A^{[l+2]}$$ would be set to a value biased towards zero as opposed to a value that would be more representative of the previous inputs. Hence, the nodes in the given layer would take a longer time to train and also have a lower accuracy.
 
-Here, we see that instead of being biased to zero, the function just reverts back to the value of the previous inputs, which are the identity function here.
+- In the case of ResNets, we focus on building information on top of the "identity" formed by pre-existing layers of the network. So, instead of being shrunk to zero, the given layer's output would consist of the additional information, or "residuals" learned by the layers in between the skip layers and the output.
+
+The idea is that if we have a shallower model learning a function, we should also be able to train a deeper model to learn the same function by copying the original five layers' values and using the additional layers to learn residuals that are added on top of the identity function.
+
+The plain model does not learn the identity function because most of the weights are initialiized close to zero, hence causing any sort of regularization to bias the weights towards zero.
 
 Hence, the idea of identity functions makes it easy for our residual blocks to train, making it so that adding the additional layers to the network will not have as much of an impact on its ability to learn.
 
@@ -1261,14 +1289,14 @@ If we also want to match up the number of channels, we use $$1 \times 1$$ convol
 
 ## Advantages of ResNets
 
-#### Skip blocks augment the existing data
+##### 1. Skip blocks augment the existing data
 
 As the skip connection passes the input down to the later layers of the neural network, the main network can focus on figuring out what information it has to add on top of the inputs as opposed to the whole input itself. This makes subsequent processing easier.
 
 - If we are concatenating the inputs, it is passed through unchanged along with the outputs. If added, the value being sent is mostly unchanged as the weights are centered around zero.
 - As a result of this each block learns a simpler task and has better access to information to learn from.
 
-#### Shorter gradient paths
+##### 2. Shorter gradient paths
 
 Due to skip connections, the gradients have shorter paths to follow to get to each layer of the network. This is because each block has one path going through each of the layers and one path around them, and the gradients go back through both of them. Hence, any layer in the network will have a shorter path which the loss gradients can arrive to and usefully update the given layer's computation
 
@@ -1276,7 +1304,7 @@ Due to skip connections, the gradients have shorter paths to follow to get to ea
 - In addition, over time, as the later blocks in the network start computing more useful functions, the information along the direct path becomes more informative, hence leading to a continued decrease in the gradients, outperforming the plain network.
 - To sum it up, this leads to **faster training**.
 
-#### Modularity
+##### 3. Modularity
 
 An additional advantage that ResNets have is modularity. Since each of the blocks have similar structures, we can short circuit around blocks during training, making it easier to add more blocks and deepen the network.
 
@@ -1284,7 +1312,7 @@ An additional advantage that ResNets have is modularity. Since each of the block
 
 ## Concerns
 
-#### Shape Mismatch
+##### 1. Shape Mismatch
 
 If we want to combine the inputs and outputs of a ResNet, we need to ensure that the input and output shapes match up. For normal activation layers like dense networks, we might end up with different numbers of neurons per layer.
 
@@ -1292,7 +1320,7 @@ Hence, when adding the inputs to the outputs of the first block, we need an oper
 
 With ConvNets, we will have to ensure that the height and width of the convolutional layers can be combined with the input height and width.
 
-#### Parameter Explosion
+##### 2. Parameter Explosion
 
 Another concern with ResNets is that with repeated concatenation at the output blocks, we can get a large activation tensor, hence leading to an explosion in the number of parameters. To counteract this, we prefer using addition to concatenation with matching input shapes.
 
@@ -1332,7 +1360,7 @@ $$
 \end{bmatrix}
 $$
 
-Here we are effectively multiplying every pixel of the give image` by $$2$$.
+Here we are effectively multiplying every pixel of the given image by $$2$$.
 
 For a $$6 \times 6 \times 32$$ image, the filter goes through each of the $$36$$ pixels of the image, taking the element-wise product with the $$32$$ pixels in the same position along the channels, hence giving us a real number output to which we apply our non-linearities.
 
@@ -1356,7 +1384,7 @@ $$28 \times 28 \times 192 \xrightarrow[CONV 1 \times 1 \;\; (32)]{ReLU} 28 \time
 
 To shrink the height and width of the volume above we would normally use a pooling layer, but we have no straightforward way to reduce the number of channels.
 
-Hence, in this case, to shrink the number of filters down to $$32$$, we use $$32$$ $$1 \times 1$$ filters with each filter having a dimensions of $$1 \times 1 \times 192$$. This wil effectively result in shrinking the number of layers down to $$28 \times 28 \times 32$$, hence helping save on computations in the networks.
+Hence, in this case, to shrink the number of filters down to $$32$$, we use $$32$$ $$1 \times 1$$ filters with each filter having a dimensions of $$1 \times 1 \times 192$$. This will effectively result in shrinking the number of layers down to $$28 \times 28 \times 32$$, hence helping save on computations in the networks.
 
 The network in network effect is the addition of a non-linearity, allowing the learning of more complex functions by adding yet another layer.
 
@@ -1389,4 +1417,99 @@ All of these are stacked one on top of the other to give us a composite output o
 
 The idea of an inception network is to be a swiss army knife to which we can put in our inputs to obtain the outputs exactly as per our needs. This network performs all the operations needed at once and concatenates them, allowing the network to learn the parameters to use alongside the filter sizes and pools needed.
 
-The main drawback of inception layers is the **computation cost**.
+The main drawback of inception layers is that the **computation cost** tends to be higher.
+
+## Inception V1
+
+The first iteration of the Inception network {% cite DBLP:journals/corr/SzegedyLJSRAEVR14 %} was created by Christian Szegedy as a part of the ILSVRC14 challenge.
+
+It was mainly developed as an efficient neural network architecture compared to previous implementations, using upto 12 times fewer parameters than AlexNet.
+
+As suggested by the meme it cites, the main idea here is to allow even deeper neural networks to be built with minimal effect on the network's performance.
+
+The idea here is that given the rise of embedded and mobile computing, algorithm efficieny in terms of power and energy use are crucial alongside accuracy itself.
+
+The inception network heavily makes use of the Network-in-Network approach to increase the representational power of the CNN. This serves two purposes:
+- Dimension reduction to remove computational bottlenecks, which would limit network size.
+- This also allows increasing the width of the network without significant impact on the performance. 
+
+#### Motivations
+
+The main way to increase the performance of a DNN is through increasing its size, both in depth and width considering the availability of data to work with. However this has some major drawbacks:
+- Larger networks will need a larger number of parameters, hence leading to more chances for overfitting in case the number of training examples is limited.
+- Increased network sizes also increase the amount of computation power needed, needing efficient distribution of computation resources. as opposed to directtly increasing the network size.
+
+To tackle this, the solution followed is to implement a sparsely connected architecture (Including inside the convolutions) and to exploit the hardware to efficiently compute dense matrices.
+
+#### Inception Architecture
+
+The main idea followed here is finding a local sparse structure that can be approximated and covered by readily available dense components. This is built using convolutional building blocks.
+
+Once the optimal local construction is found, it is repeated spatially. A layer by layer construction is followed where correlation statistics of the previous layer are analyzed and grouped into units with high correlation.
+
+These groups/clusters are then used as units for the next layer and are connected to the units of the previous layer.
+
+Using the same example as before, we could make a composition of the form
+- A $$1 \times 1$$ convolution to give a $$28 \times 2 \times 64$$ output.
+- A $$3 \times 3$$ same convolution to give a $$28 \times 28 \times 128$$ output.
+- A $$5 \times 5$$ same convolution to give a $$28 \times 28 \times 32$$ output.
+- A max pooling layer with padding to give us a $$28 \times 28 \times 32$$ output.
+
+And then repeat this structure multiple times as per our need.
+
+As the inception modules are stacked, the output correlation statistics will vary as features with higher abstraction are captured deep into the network. This leads to lesser spatial concentration and as a result, the computations become much more expensive. Max pooling, when added to the mix, leads to an increase in the number of outputs at each stage.
+
+To combat this, **dimension reduction** is practiced at points where computational requirements go high. This is done with the help of $$1 \times 1$$ convolutions before the more expensive $$3 \times 3$$ and $$5 \times 5$$ convolutions. The resultant inception models are as follows.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-8 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/naive_inception.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+    Source, "Going Deeper With Convolutions" (Szegedy et al., 2014)
+</div>
+
+<div class="row justify-content-center mt-3">
+    <div class="col-8 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/dimension_reduced_inception.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+    Source, "Going Deeper With Convolutions" (Szegedy et al., 2014)
+</div>
+
+Hence, as a result we have a network architecture that alows us to build deep models without an increase in computational complexity and, in addition, allows visual information to be processed at various scales and aggregated so that the next layers can abstract features from them parallelly.
+
+#### GoogLeNet
+
+GoogLeNet made use of this Inception architecture to perform well under strict memory and computational budget, using only 5 million parameters, as opposed to AlexNet and VGGNet.
+
+The resultant neural network architecture that was proposed by the team using these inception modules is shown below.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-12 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/googleNet.jpg" class="img-fluid rounded z-depth-1" zoomable=true%}
+    </div>
+</div>
+<div class="caption">
+    Source, "Going Deeper With Convolutions" (Szegedy et al., 2014)
+</div>
+
+As we can see here, there are two extra "auxillary networks" added to the architecture here aside from the inception layers. These serve the purpose of helping reduce the **vanishing gradient** problem that is introduced when training deep neural networks.
+
+The auxillary classifiers make use of the outputs of the intermediate inception net layer outputs to generate softmax predictions of their own, based on which auxillary losses are obtained. These auxillary losses are used to augment the loss function during the training process. This is in the form
+
+$$
+J_{\text{total}} = J + (0.3 \times J_{\text{aux1}}) + (0.3 \times J_{\text{aux2}}) 
+$$
+
+These auxillary networks only serve the purpose of training the model and are removed during the inference process.
+
+## Inception V2
+
+The second version of the inception network {% cite DBLP:journals/corr/SzegedyVISW15 %} acknowledged the effectiveness of its older version, touting its effectiveness in solving big data problems with a lower effective cost. However, it also points out a major drawback of Inception v1 quoted directly from the paper:
+
+> The complexity of the inception network makes it more difficult to make changes to the network.
+
+Scaling up inception networks naively eliminates any computational gains that one would expect from such an architecture. In addition there was no explanation as to why 
