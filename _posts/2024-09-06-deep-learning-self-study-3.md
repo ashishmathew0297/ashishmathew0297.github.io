@@ -1512,4 +1512,145 @@ The second version of the inception network {% cite DBLP:journals/corr/SzegedyVI
 
 > The complexity of the inception network makes it more difficult to make changes to the network.
 
-Scaling up inception networks naively eliminates any computational gains that one would expect from such an architecture. In addition there was no explanation as to why 
+The main aim of this paper was to upgrade this model such to increase its accuracy while also reducing the computational complexity.
+
+Naively scaling up inception networks eliminates any computational gains that one would expect from such an architecture. In addition there was no explanation as to why certain design decisions were made with GoogLeNet, hence making it difficult to adapt to new use cases.
+
+The main things tackled here are:
+- **Avoiding representational bottlenecks:** The idea here is that instead of directly jumping from larger dimensions to smaller ones with large amounts of compression, the network must, instead, work towards gradually decreasing the representation size from the inputs to the outputs. Large jumps in the dimensions of the layers leads to a loss of information crucial for the network to train on, which is known as a **representational bottleneck**.
+- **Using smart factorization methods** such as increasing the activations per tile, spatial aggregation and balancing the width and depth of the network to make the training process more efficient.
+
+### Fixes proposed
+
+##### 1. Factorizing convolutions with large filter sizes
+The first change that was made to the network architecture was factorizing convolutions with larger filter sizes such as $$5 \times 5$$ or $$7 \times 7$$ to smaller sizes.
+
+In this case the $$5 \times 5$$ convolutions are replaced with mini networks consisting of two $$3 \times 3$$ convolution layers as seen below.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-6 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/original_inception.jpg" class="img-fluid rounded z-depth-1" %}
+    </div>
+    <div class="col-6 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/5x5_factorized_inception.jpg" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+    The original inception architecture alongside the new change proposed (Szegedy et al., 2015). Note the filter marked by a red boundary.
+    This is "Figure 5"
+</div>
+
+
+##### 2. Futher factorization of $$n \times n$$ filters to a combination of $$1 \times n$$ and $$n \times 1$$ convolutions
+
+The inception module can further be changed by using asymmetric convolutions on the images, which would make each of them behave like a single layer fully connected with one another.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-8 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/1xn_nx1_variant.jpg" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+    The proposed (1,n) and (n,1) architecture (Szegedy et al., 2015). This is "Figure 6"
+</div>
+
+Taking the case of a $$3 \times 3$$ filter, each can be replaced with a $$3 \times 1$$ convolution followed by a $$1 \times 3$$ convolution.
+
+This solution is $$33\%$$ cheaper than the full $$3 \times 3$$ convolution. For $$n \times n$$ filters, as $$n$$ increases in value, this can lead to drastic improvements in computational cost saving.
+
+This idea is, however, not effective at the earlier layers of the network, but works well on medium grid sizes.
+
+##### 3. Using higher dimension representations to increase the activations per tile
+
+It was found that using higher dimension representations would allow for disentanglement of the features being worked on, hence leading to faster training. As a result another inception layer type was introduced with expanded filter bank outputs.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-8 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/expanded_filter_banks.jpg" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+    The proposed expanded filter banks architecture (Szegedy et al., 2015). This is "Figure 7"
+</div>
+
+This helped with removing representational bottlenecks.
+
+### Network Architecture
+
+Using the architectures proposed above, the final proposed neural network architecture is given below 
+
+| type                   | patch size/stride  | input size                   |
+| ---------------------- | ------------------ | ---------------------------- |
+| conv                   | $$3 \times 3/2$$   | $$299\times 299 \times 3$$   |
+| conv                   | $$3 \times 3/1$$   | $$149 \times 149 \times 32$$ |
+| conv padded            | $$3 \times 3/1$$   | $$147 \times 147 \times 32$$ |
+| pool                   | $$3 \times 3/2$$   | $$147 \times 147 \times 64$$ |
+| conv                   | $$3 \times 3/1$$   | $$73 \times 73 \times 64$$   |
+| conv                   | $$3 \times 3/2$$   | $$71 \times 71 \times 80$$   |
+| conv                   | $$3 \times 3/1$$   | $$35 \times 35 \times 192$$  |
+| $$3 \times$$ Inception | As in figure $$5$$ | $$35 \times 35 \times  288$$ |
+| $$5 \times$$ Inception | As in figure $$6$$ | $$17\times 17 \times 768$$   |
+| $$2 \times$$ Inception | As in figure $$7$$ | $$8\times 8 \times1280$$     |
+| pool                   | $$8 \times 8$$     | $$8 \times 8 \times 2048$$   |
+| linear                 | logits             | $$1 \times 1 \times 2048$$   |
+| softmax                | classifier         | $$1 \times 1 \times 1000$$   |
+
+<br>
+
+## Inception V3
+
+This version of Inception was proposed in the same paper as Inception V2 and has more or less the same upgrades that were implemented in Inception V2. The main improvements made here were:
+
+- RMSProp Optimizer was implemented.
+- $$7 \times 7$$ convolutions were factorized into three $$3 \times 3$$ convolutions.
+- **Batch Normalization in the auxillary classifiers:** If we look back at the first version of inception networks, there were two auxillary classifiers introduced that were believed to help augment the stability, improve the convergence and mitigate the vanishing gradient problem.
+    - However, it was later found that these did not necessarily help much in improving the convergence earlier in the training process. Instead they acted more as regularization for their respective layers.
+    - Batch Normalizing these auxillary classifiers was found to lead to a better performance of the main network.
+- Label smoothing was implemented as a regularizing component in the loss formula to prevent overfitting.
+
+## Other implementations
+
+There have been more implementations of the inception network such as Inception V4 and Inception-ResNet, which were introduced in the same paper {% cite DBLP:journals/corr/SzegedyIV16 %} in 2016. These dealt with the addition of residual connections to inception blocks to prevent the loss of computed values deeper into the networks.
+
+As of now we will not look into these architectures as there is much more to talk about in computer vision, and focusing on these will take up a lot of time on the blog (which is long enough as is). It is always advised to read the related paper as it is well written and does a really good job at explaining what is going on.
+
+# MobileNet
+
+MobileNet {% cite DBLP:journals/corr/HowardZCKWWAA17 %} is another foundational neural network architecture designed with a focus on being lightweight and efficient for computer vision based applications in low compute environments like mobile phones and microprocessors.
+
+The main motivations for this architecture are:
+- Low computational costs
+- Usage of models with this architecture in mobile phones and embedded systems.
+- Introducing the idea of depth-wise separable convolutions.
+
+The idea of this class of network architecture is to allow a deep learning model developers to choose a small network according to the constraints of the machine it is being run on. This is meant to optimize for latency (speed) while yielding small networks.
+
+This architecture implements the idea of "depthwise separable convolutions" which were previously used in inception networks but were never given a proper name. These help reduce the computation costs at the lower layers of the network.
+
+## What MobileNet aims to solve
+
+Looking back at normal convolutions as seen from the example below
+
+<div class="row justify-content-center mt-3">
+    <div class="col-8 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/RGBConv1.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+
+Assuming input image dimensions to be $$n \times n \times n_{c}$$ being put through a convolution filter of dimension $$f \times f \times n_{c}$$. Each side of the output obtained here, taking $$p$$ as the padding and $$s$$ as the stride, would be:
+
+$$\frac{n + 2p -f}{s}$$
+
+If we were to compute the cost here, it would be of the form
+
+$$\text{Computational cost} = \text{# filter params } \times \text{ # filter positions } \times \text{ # of filters}$$
+
+So, taking the number of filters to be $$5$$ with $$0$$ padding and stride $$1$$, the computational cost would be
+
+$$\text{Computational Cost} = (3 \times 3 \times 3) \times (4 \times 4) \times 5 = 2160$$
+
+Though this may seem small, when building deeper networks, the computational costs of these calculations add up, hence impacting the performance of the network.
+
+The **depthwise separable convolutions** were introduced to help with this issue.
+
+## Depthwise Separable Convolutions
