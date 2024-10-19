@@ -1616,7 +1616,11 @@ As of now we will not look into these architectures as there is much more to tal
 
 # MobileNet
 
-MobileNet {% cite DBLP:journals/corr/HowardZCKWWAA17 %} is another foundational neural network architecture designed with a focus on being lightweight and efficient for computer vision based applications in low compute environments like mobile phones and microprocessors.
+Deep neural networks which distinguish between a wide variety of labels generate a large amount of features, especially as we go deeper into the layers. This becomes computationally expensive because the number of channels of the filters also increase as one uses more filters while going` deeper into the network.
+
+MobileNet {% cite DBLP:journals/corr/HowardZCKWWAA17 %} is another foundational neural network architecture designed with a focus on solving the computational scalability issues mentioned before while being lightweight and efficient for computer vision based applications in low compute environments like mobile phones and microprocessors.
+
+The idea here is that each filter need not necessarily look at every single channel of the input at once. We can instead make each filter work on the input channels one by one and combine them into a single output.
 
 The main motivations for this architecture are:
 - Low computational costs
@@ -1632,7 +1636,7 @@ This architecture implements the idea of "depthwise separable convolutions" whic
 Looking back at normal convolutions as seen from the example below
 
 <div class="row justify-content-center mt-3">
-    <div class="col-8 mt-3 mt-md-0">
+    <div class="col-12 mt-3 mt-md-0">
         {% include figure.liquid loading="eager" path="assets/img/RGBConv1.png" class="img-fluid rounded z-depth-1" %}
     </div>
 </div>
@@ -1641,9 +1645,11 @@ Assuming input image dimensions to be $$n \times n \times n_{c}$$ being put thro
 
 $$\frac{n + 2p -f}{s}$$
 
-If we were to compute the cost here, it would be of the form
+If we were to compute the cost here, it would be proportional to the form
 
 $$\text{Computational cost} = \text{# filter params } \times \text{ # filter positions } \times \text{ # of filters}$$
+
+with the computational costs depending multiplicatively on the number of input channels, number of output channels, kernel size and feature map/image size.
 
 So, taking the number of filters to be $$5$$ with $$0$$ padding and stride $$1$$, the computational cost would be
 
@@ -1654,3 +1660,92 @@ Though this may seem small, when building deeper networks, the computational cos
 The **depthwise separable convolutions** were introduced to help with this issue.
 
 ## Depthwise Separable Convolutions
+
+The depthwise separable convolution consists of two stages
+- The **depthwise** convolution stage, followed by
+- The **pointwise** convolution stage
+
+and the order of computing these are shown below
+
+<div class="row justify-content-center mt-3">
+    <div class="col-12 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/depthwise_separable_convolution.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+
+The depthwise part applies a single filter to each input channel and the pointwise convolution applies a $$1 \times 1$$ convolution to combine the outputs of the depthwise convolution.
+
+The idea here is to split up the interaction between the number of output channels and kernel size.
+
+We will now look at what occurs during each stage.
+
+#### Depthwise Convolution
+
+Here, for a $$n \times n \times n_c$$ input, where $$n_c$$ is the number of channels, we make use of a filter of dimensions $$f \times f$$ applied to each channel of the input.
+
+Here, one of each of the filters is applied to each of the corresponding input channels such that, the red channel is convolved with one filter, the green with another one and so on, till we get a $$n_{out} \times n_{out} \times n_c$$ output.
+
+The computation cost here is proportional to
+
+$$(3 \times 3) \times (4 \times 4) \times 3 = 432$$
+
+As we can see here, this depthwise convolution action is much more efficient than a standard convolution, however it is only filtering the input channels in certain manners. It isn't combining these to create a feature map. This is where **pointwise convolutions** come into the picture.
+
+#### Pointwise Convolution
+
+Naively concatenating the outputs of the depthwise convolution layer leads to an issue where each layer of the output would only depend on one of the convolution action of the input. This pattern will repeat deeper into the network, hence not giving us as effective of a result as a normal convolution layer.
+
+To combat this we make use of $$1 \times 1$$ convolutions known as **pointwise convolutions** corresponding to the number of filter we need to act on the input.
+
+The pointwise convolution takes the $$n_{out} \times n_{out} \times n_{c}$$ convolution obtained from the depthwise convolution part and applies number of $$1 \times 1$$ convolutions equal to the number of filters being applied to the input.
+
+Taking the same example as before where we have a $$6 \times 6 \times 3$$ input with a filter size of $$3$$, stride of $$1$$, padding $$0$$ and number of filters as $$5$$, the computational cost here would be proportional to
+
+$$(1 \times 1 \times 3) \times (4 \times 4) \times 5 = 240$$
+
+#### Comparing the cost with normal convolutions
+
+Adding up the depthwise and pointwise convolution parts, we get the total computational costs to be proportional to 
+
+$$\underbrace{((3 \times 3) \times (4 \times 4) \times 3)}_{\text{depthwise}} + \underbrace{((1 \times 1 \times 3) \times (4 \times 4) \times 5)}_{\text{pointwise}} = 672$$
+
+which is much lower compared to that of a normal convolution which is
+
+$$(3 \times 3 \times 3) \times (4 \times 4) \times 5 = 2160$$
+
+Here we see that the depthwise separable convolutions are $$31 \%$$ as computationally expensive as a normal convolution layer.
+
+## Generalized formulae for computational costs and their ratios
+
+Generalizing the formula for computation costs, we take the following:
+- $$n_c$$ as **number of channels**
+- $$f$$ as **filter dimension**
+- $$n_f$$ as **number of filters** being used
+- $$n_{out}$$ as the **output dimensions**, which can also be seen as the **number of filter positions** on the input image.
+
+and get
+
+$$
+\begin{align*}
+& \boxed{\text{Computations}_{\text{MobileNet}} = (f \times f \times n_c \times n_{out} \times n_{out}) + (n_c \times n_{out} \times n_{out} \times n_f)} \\
+& \boxed{\text{Computations}_{\text{ConvNet}} = f \times f \times n_c \times n_{out} \times n_{out} \times n_f} \\
+& \boxed{\text{Computations Ratio} = \frac{\text{Computations}_{\text{MobileNet}}}{\text{Computations}_{\text{ConvNet}}} = \frac{1}{n_f} + \frac{1}{f^2}}
+\end{align*}
+$$
+
+## MobileNet Architecture
+
+The MobileNet architecture is fairly straightforward. Wherever we would have particularly heavy computations involving convolution operations, we use depthwise separable convolutions.
+
+The MobileNet V1 paper implemented this block 13 times from the raw image inputs to the final classification prediction vis a pooling layer, fully connected layer and a softmax output.
+
+The second version of this architecture MobileNet V2 made two changes to its structure:
+- It added a resudual connection from the input layer, passing the information directly to the later layers.
+- It included an expansion layer before the depthwise separable convolution pair, known as a projection.
+
+V2 of this architecture used this block 17 times ending with a pooling layer, fully connected layer and a softmax output.
+
+## MobileNet V2
+
+The name of the block used here is known as the **bottleneck block**.
+
