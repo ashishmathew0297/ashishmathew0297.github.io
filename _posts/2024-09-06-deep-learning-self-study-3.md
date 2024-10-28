@@ -1781,3 +1781,4 @@ The second version of the MobileNet architecture, MobileNet V2, made two changes
 
 The name of the block used here is known as the **bottleneck block**.
 
+Ever since depthwise seprarble convolutions became a thing, many neural network architectures have adopted this architectural idea as a drop-in replacement for standard convolutionss
