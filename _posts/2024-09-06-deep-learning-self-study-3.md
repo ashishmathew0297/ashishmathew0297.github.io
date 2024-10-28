@@ -1739,13 +1739,45 @@ The MobileNet architecture is fairly straightforward. Wherever we would have par
 
 The MobileNet V1 paper implemented this block 13 times from the raw image inputs to the final classification prediction vis a pooling layer, fully connected layer and a softmax output.
 
-The second version of this architecture MobileNet V2 made two changes to its structure:
-- It added a resudual connection from the input layer, passing the information directly to the later layers.
-- It included an expansion layer before the depthwise separable convolution pair, known as a projection.
+## Experiments done on the MobileNet architecture
 
-V2 of this architecture used this block 17 times ending with a pooling layer, fully connected layer and a softmax output.
+### Model Shrinking Hyperparameters: The Width Multiplier
+
+A concept introduced with this hyperparameter to make the network much less computationally expensive was the **width multiplier**, $$\alpha$$.
+
+The width multiplier's job is to ensure that at each layer, the network remains thin. It's value is set such that $$\alpha \in (0,1]$$.
+
+So, considering the number of input channels to be $$n_c$$, the computations become proportional to
+
+$$
+\text{Computations}_{\text{MobileNet}} = (f \times f \times \alpha n_c \times n_{out} \times n_{out}) + (\alpha n_c \times n_{out} \times n_{out} \times \alpha n_f)
+$$
+
+The computational costs here are reduced by $$\alpha^2$$ times.
+
+The $$\alpha$$ values' computation and size tradeoff leads to a smooth accuracy dropoff until $$\alpha = 0.25$$.
+
+
+
+### Model Shrinking Hyperparameters: The Resolution Multiplier
+
+The **resolution multiplier** is another hyperparameter here which helps reduce the computational costs of the neural network. It is denoted by $$\rho$$ such that $$\rho \in [0,1)$$.
+
+The resolution multiplier is applied to the image inputs to effectively decrease their resolution. The effective computation considering this hyperparameter along with the width multiplier is:
+
+$$
+\text{Computations}_{\text{MobileNet}} = (f \times f \times \alpha n_c \times \rho n_{out} \times \rho n_{out}) + (\alpha n_c \times \rho n_{out} \times \rho n_{out} \times \alpha n_f)
+$$
+
+The effective reduction in computational cost owing to this paramparameter is by $$\rho^{2}$$. 
+
+
 
 ## MobileNet V2
+
+The second version of the MobileNet architecture, MobileNet V2, made two changes to its structure:
+- It added a resudual connection from each of the units' input layer, passing the information directly to the later layers.
+- It included an expansion layer before the depthwise separable convolution pair, known as a projection.
 
 The name of the block used here is known as the **bottleneck block**.
 
