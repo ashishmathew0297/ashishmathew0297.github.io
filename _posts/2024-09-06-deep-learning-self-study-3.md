@@ -1773,12 +1773,13 @@ The effective reduction in computational cost owing to this paramparameter is pr
 
 ## MobileNet V2
 
-The second version of the MobileNet architecture, MobileNet V2, made two changes to its structure:
+The second version of the MobileNet architecture, MobileNet V2 {% cite DBLP:journals/corr/abs-1801-04381 %} was introduced by a group of researchers in 2017, which made two changes to its structure:
 - It added a resudual connection from each of the units' input layer, passing the information directly to the later layers.
 - It included an expansion layer before the depthwise separable convolution pair, known as a projection.
 
-
 Ever since depthwise seprarble convolutions became a thing, many neural network architectures have adopted this idea as a drop-in replacement for standard convolutions. This led to a reduction in computational costs proportional to $$f^{2}$$ where $$f$$ is the filter dimension.
+
+The original MobileNet depthwise separable convolution block implements a $$1 \times 1$$ filter followed by a depthwise convoltion of size $$n \times n$$ (in this case $$n = 3$$) and a pointwise convolution of dimensions $$1 \times 1$$. This effectively follows a $$\text{Wide} \rightarrow \text{Narrow} \rightarrow \text{Wide}$$ pattern when we look at the number of channels we are dealing with. As a result the 
 
 MobileNet V2 sets the value of $$f$$ to $$3$$, hence leading to the computational costs being approximately $$9$$ times smaller than that of normal $$3 \times 3$$ convolution blocks with a minimal reduction in the accuracy.
 
@@ -1796,9 +1797,10 @@ The last step brings down the dimensions of inputs $$k$$ to $$k'$$ due to which 
 
 ### What the Bottleneck Block Accomplishes
 
-There are two main things that the bottleneck block aims to accomplish:
-- The expansion opeation increases the size of the representation, hence allowing the network to learn a richer function
-- The pointwise convolution/projection operation increases the representation down to a smaller set of values. Hence, when information is passed to the next block, the amount of memory used to store the values is again reduced.
+The main things that the bottleneck block aims to accomplish are:
+- The pointwise convolution/projection reducces the dimensionality of the input features to a smaller set of values before extracting new features from them. Hence, this leads to an increase in efficiency of the computations while maintaining a good level of accuracy.
+- Residual connections here help improve the flow of information in the network.
+- The effective number of matrix multiplication actions being performed is reduced significantly
 
 <!-- #### What are manifolds?
 
