@@ -1755,8 +1755,7 @@ $$
 
 The computational costs here are reduced by $$\alpha^2$$ times.
 
-The $$\alpha$$ values' computation and size tradeoff leads to a smooth accuracy dropoff until $$\alpha = 0.25$$.
-
+The $$\alpha$$ values lead to a computation and size tradeoff with a smooth accuracy dropoff until $$\alpha = 0.25$$ after which the model becomes too small.
 
 
 ### Model Shrinking Hyperparameters: The Resolution Multiplier
@@ -1769,8 +1768,7 @@ $$
 \text{Computations}_{\text{MobileNet}} = (f \times f \times \alpha n_c \times \rho n_{out} \times \rho n_{out}) + (\alpha n_c \times \rho n_{out} \times \rho n_{out} \times \alpha n_f)
 $$
 
-The effective reduction in computational cost owing to this paramparameter is by $$\rho^{2}$$. 
-
+The effective reduction in computational cost owing to this paramparameter is proportional to $$\rho^{2}$$. 
 
 
 ## MobileNet V2
@@ -1779,6 +1777,35 @@ The second version of the MobileNet architecture, MobileNet V2, made two changes
 - It added a resudual connection from each of the units' input layer, passing the information directly to the later layers.
 - It included an expansion layer before the depthwise separable convolution pair, known as a projection.
 
-The name of the block used here is known as the **bottleneck block**.
 
-Ever since depthwise seprarble convolutions became a thing, many neural network architectures have adopted this architectural idea as a drop-in replacement for standard convolutionss
+Ever since depthwise seprarble convolutions became a thing, many neural network architectures have adopted this idea as a drop-in replacement for standard convolutions. This led to a reduction in computational costs proportional to $$f^{2}$$ where $$f$$ is the filter dimension.
+
+MobileNet V2 sets the value of $$f$$ to $$3$$, hence leading to the computational costs being approximately $$9$$ times smaller than that of normal $$3 \times 3$$ convolution blocks with a minimal reduction in the accuracy.
+
+### Model Architecture
+
+The name of the block used here is the **bottleneck block**, and it is the basis of our model architecture. The main components of this block are a depthwise separable convolution with a residual connection and an additional Expansion layer before the depthwise separable layer. The structure of this block is shown below
+
+<div class="row justify-content-center mt-3">
+    <div class="col-12 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/MobileNetV2.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+
+The last step brings down the dimensions of inputs $$k$$ to $$k'$$ due to which it gets the name **projection** layer.
+
+### What the Bottleneck Block Accomplishes
+
+There are two main things that the bottleneck block aims to accomplish:
+- The expansion opeation increases the size of the representation, hence allowing the network to learn a richer function
+- The pointwise convolution/projection operation increases the representation down to a smaller set of values. Hence, when information is passed to the next block, the amount of memory used to store the values is again reduced.
+
+<!-- #### What are manifolds?
+
+Before moving further we must understand what a manifold is.
+
+When we have data at higher dimensions like 4, 5 and above, we cannot fathom what it would be like to visualize these as opposed to 2D and 3D spaces. To help with this, we need to reduce the dimensions of the dataset.
+
+One way to do this is taking a projection of the data to allow visualizing it, such as in the case of Principal Component Analysis and other such methods.
+
+Manifolds generalize linear frameworks like PCA to accommodate for non-linear data -->
