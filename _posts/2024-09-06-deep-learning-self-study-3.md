@@ -1777,9 +1777,7 @@ The second version of the MobileNet architecture, MobileNet V2 {% cite DBLP:jour
 - It added a resudual connection from each of the units' input layer, passing the information directly to the later layers.
 - It included an expansion layer before the depthwise separable convolution pair, known as a projection.
 
-Ever since depthwise seprarble convolutions became a thing, many neural network architectures have adopted this idea as a drop-in replacement for standard convolutions. This led to a reduction in computational costs proportional to $$f^{2}$$ where $$f$$ is the filter dimension.
-
-The original MobileNet depthwise separable convolution block implements a $$1 \times 1$$ filter followed by a depthwise convoltion of size $$n \times n$$ (in this case $$n = 3$$) and a pointwise convolution of dimensions $$1 \times 1$$. This effectively follows a $$\text{Wide} \rightarrow \text{Narrow} \rightarrow \text{Wide}$$ pattern when we look at the number of channels we are dealing with. As a result the 
+Ever since depthwise seprarble convolutions became a thing, many neural network architectures have adopted this idea as a drop-in replacement for standard convolutions. This led to a reduction in computational costs proportional to $$f^{2}$$ where $$f$$ is the filter dimension. 
 
 MobileNet V2 sets the value of $$f$$ to $$3$$, hence leading to the computational costs being approximately $$9$$ times smaller than that of normal $$3 \times 3$$ convolution blocks with a minimal reduction in the accuracy.
 
@@ -1793,7 +1791,25 @@ The name of the block used here is the **bottleneck block**, and it is the basis
     </div>
 </div>
 
+The {% cite Paul2018 %} original MobileNet depthwise separable convolution block implements a $$1 \times 1$$ filter followed by a depthwise convolution of size $$n \times n$$ (in this case $$n = 3$$) and a pointwise convolution of dimensions $$1 \times 1$$. This effectively follows a $$\text{Wide} \rightarrow \text{Narrow} \rightarrow \text{Wide}$$ pattern when we look at the number of channels we are dealing with.
+
+In MobileNet V2 the block follows a $$\text{Narrow} \rightarrow \text{Wide} \rightarrow \text{Narrow}$$ approach, where the first step is to widen the network using $$1 \times 1$$ convolutions after which we apply the $$3 \times 3$$ depthwise convolution. This is because, by virtue of the behavior of the depthwise separable block, we are reducing the number of parameters we work with. The final $$1 \times 1$$ convolution layer, known as the **projection** layer, helps bring the network back to the same number of initial channels.
+
 The last step brings down the dimensions of inputs $$k$$ to $$k'$$ due to which it gets the name **projection** layer.
+
+#### The introduction of ReLU6
+
+An interesting change that was implemented in this architecture was the implementation of ReLU6 as opposed to normal ReLU.
+
+$$
+\begin{align*}
+& ReLU = max(0,x) \\
+& ReLU6 = min(max(0,x),6)
+\end{align*}
+$$
+
+a
+This function ensures that the output is linear as long as it lies between $$0$$ and $$6$$. In contrast, normal ReLU ensures that the output is linear for values greater than equal to $$0$$.
 
 ### What the Bottleneck Block Accomplishes
 
@@ -1801,6 +1817,10 @@ The main things that the bottleneck block aims to accomplish are:
 - The pointwise convolution/projection reducces the dimensionality of the input features to a smaller set of values before extracting new features from them. Hence, this leads to an increase in efficiency of the computations while maintaining a good level of accuracy.
 - Residual connections here help improve the flow of information in the network.
 - The effective number of matrix multiplication actions being performed is reduced significantly
+
+The final network proposed by Google had an efficiency comparable to NASNet, the state of the art model at the time whose building blocks were developed by another neural network, while also being easily explainable in its working as opposed to NASNet.
+
+# EfficientNet
 
 <!-- #### What are manifolds?
 
