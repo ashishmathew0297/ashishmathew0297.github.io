@@ -82,10 +82,10 @@ A low **training set error** can be an indicator that the model fits the trainin
 This is where the **development set** comes in. This set helps is understand whether our model does a good job at generalizing over unknown data.
 
 A few scenarios we can look at regarding the training and dev set errors are:
-- A **low training and high dev error** is indicative of our model _overfitting_ the data, having a *high variance*.
-- A **high training and dev error** indicates that our model is _underfitting_ the data suggesting a *high bias*.
-- If **both errors are high and close** then the model may have *both a high bias and variance*.
-- If **both errors are low**, this is the ideal outcome which tells us that our model is *performing well*.
+- A **low training and high dev error** is indicative of our model _overfitting_ the data, having a _high variance_.
+- A **high training and dev error** indicates that our model is _underfitting_ the data suggesting a _high bias_.
+- If **both errors are high and close** then the model may have _both a high bias and variance_.
+- If **both errors are low**, this is the ideal outcome which tells us that our model is _performing well_.
 
 The analyses of these errors are based on the assumption that the human error or the lower limit of possible error for the model, a.k.a **Bayes Error** is $$0$$.
 
@@ -480,7 +480,7 @@ We must always ensure that the mini batch size taken fits in the memory of the C
 
 There exist a large number of algorithms that can perform better than gradient descent. We will now look at a few of them, but before that, we need to know about the underlying concept they are based on, which is known as **exponentially weighted averages**.
 
-Consider the temperature values in a town over a year. The data would normally be noisy. If we want to compute the trends then, as opposed to normal average, we have to make use of a *moving average* of the temperature to keep track of the day to day changes.
+Consider the temperature values in a town over a year. The data would normally be noisy. If we want to compute the trends then, as opposed to normal average, we have to make use of a _moving average_ of the temperature to keep track of the day to day changes.
 
 If we took the initial weighted average to be $$v_{0}=0$$, and on every day, we average it with a weight of $$0.9$$ times the previous $$v$$ value that appears and $$0.1$$ times the given day's temperature, we would get the weighted average calculated as follows
 
@@ -528,7 +528,7 @@ Hence, the $$\beta$$ value here is yet another hyperparameter which can give us 
 
 The Exponentially Weighted Average (EWA) or Exponentially Weighted Moving Average (EWMA){% cite tobias2022 %} is used as a smoothing technique in time series data, and in this case, as a way to smooth out the cost function of neural networks when training them using mini batch gradient descent.
 
-This algorithm depends on a *weight parameter* $$\beta$$ which helps decide how much the current observation contributes to the total when calculating the EWA.
+This algorithm depends on a _weight parameter_ $$\beta$$ which helps decide how much the current observation contributes to the total when calculating the EWA.
 
 So taking the equation of exponential averages, we get the mean calculation as
 
@@ -656,7 +656,7 @@ This induces an effect of momentum where, when a new point is introduced to the 
 
 As a result the overall gradient descent process is slowed down due to it preventing us from using a larger learning rate as it would diverge and overshoot the minimum.
 
-Another way to think of this is *minimizing the bowl shape of the function*. Consider a ball rolling down a hill. The derivative terms act as acceleration on the ball rolling downhill and the momentum terms represent velocity of the ball. $$\beta$$ here acts as the friction preventing the ball from speeding up too much as the acceleration is imparted to it. As a result, rather than gradient descent taking every step independently of all the previous steps, the ball can gain momentum as a result of the aggregate velocity and the acceleration and friction acting on it.
+Another way to think of this is _minimizing the bowl shape of the function_. Consider a ball rolling down a hill. The derivative terms act as acceleration on the ball rolling downhill and the momentum terms represent velocity of the ball. $$\beta$$ here acts as the friction preventing the ball from speeding up too much as the acceleration is imparted to it. As a result, rather than gradient descent taking every step independently of all the previous steps, the ball can gain momentum as a result of the aggregate velocity and the acceleration and friction acting on it.
 
 Consider an example where we are optimizing a cost function with the following contour.
 
@@ -984,7 +984,7 @@ When sampling hyperparameters at random, we do not randomly sample uniformly ove
 
 - The sample range for learning rate is usually $$[0.0001,1]$$
 - Uniform sampling over this range would be inefficient as most of the values would lie between $$0.1$$ to $$1$$.
-- In this case we make use of a *logarithmic scale*.
+- In this case we make use of a _logarithmic scale_.
 - So, we take a logarithmic range between, for example, $$10^a$$ to $$10^b$$, selecting our random value on this range as $$10^r$$.
 
 ### Sampling Exponentially Weighted Average hyperparameters

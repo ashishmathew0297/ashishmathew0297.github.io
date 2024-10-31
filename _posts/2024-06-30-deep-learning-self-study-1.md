@@ -27,7 +27,7 @@ In the world of data science {% cite coursera2024 %}, we usually see mentions of
 
 **Machine learning** algorithms are relatively simple models designed to adapt on input data and either find patterns or make decisions on newly provided data.
 
-**Deep learning** on the other hand, is a branch of machine learning that involves training expansive *artificial neural networks (ANNs)*. An ANN consists of layers of interconnected nodes called _neurons_ that, together, help process and learn patterns from the input.
+**Deep learning** on the other hand, is a branch of machine learning that involves training expansive _artificial neural networks (ANNs)_. An ANN consists of layers of interconnected nodes called _neurons_ that, together, help process and learn patterns from the input.
 
 We often picture AI, deep learning and machine learning as a Venn diagram with AI taking up the outermost layer, machine learning being the intermediate layer, and the innermost layer being deep learning. A more detailed visualization of this can be seen below.
 
@@ -89,10 +89,10 @@ This resulting function is known as a **Rectified Linear Unit** or **ReLU** for 
 
 ##### Scenario 2
 
-Now, suppose we have more features to work with in addition to the size of the house, such as the number of _bedrooms_, *zip code* and _wealth_ of the neighborhood. In this scenario we can make the following observations:
-- The _size_ and *number of bedrooms* gives us an idea of whether a house can accommodate for the *family size*.
-- The *zip code* tells us how _walkable_ the locality of the house is.
-- The *zip code* along with the _wealth_ of the neighborhood can give us an idea of the *quality of schools* in the area.
+Now, suppose we have more features to work with in addition to the size of the house, such as the number of _bedrooms_, _zip code_ and _wealth_ of the neighborhood. In this scenario we can make the following observations:
+- The _size_ and _number of bedrooms_ gives us an idea of whether a house can accommodate for the _family size_.
+- The _zip code_ tells us how _walkable_ the locality of the house is.
+- The _zip code_ along with the _wealth_ of the neighborhood can give us an idea of the _quality of schools_ in the area.
 
 All of this information can be visualized in the form of a neural network as shown.
 
@@ -370,7 +370,7 @@ Computation graphs are a way for us to visualize mathematical expressions in a d
 
 The computations in a neural network are of two forms:
 - **Forward pass/propagation** where the _output_ of the neural network is computed.
-- **Backward pass/propagation**, which is used to calculate the *gradients/derivatives*.
+- **Backward pass/propagation**, which is used to calculate the _gradients/derivatives_.
 
 Here, they find use in describing both the forward and the backward propagation algorithm in a precise manner.
 
