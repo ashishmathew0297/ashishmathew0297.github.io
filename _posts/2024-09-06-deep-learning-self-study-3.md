@@ -1822,6 +1822,58 @@ The final network proposed by Google had an efficiency comparable to NASNet, the
 
 # EfficientNet
 
+The EfficientNet paper {% cite DBLP:journals/corr/abs-1905-11946 %}, rather than introducing super novel and complex architectures, focuses more on model scaling methods to see how one can balance the model depth, width and resolution to improve the overall performance of the network.
+
+The idea of how one must go about scaling up convolutional neural networks was never set in stone and there are many ways one can go about it. The main question this paper poses is:
+
+> Is there a principled method to scale up ConvNets that can achieve better accuracy and efficiency?
+
+The authors of this paper proposed a *compound scaling method* where the various dimensions of the network, namely the
+- **Width** of the layers
+- **Depth** of the layers
+- **Resolution** of tje images
+were uniformly scaled by fixed ratios as opposed to arbitrary scales.
+
+So, based on the resources available, these dimensions would have to be scaled up based on a grid search using the initial model.
+
+This compound scaling method is used on already existing networks like MobileNet and ResNets to obtain the **EfficientNet** family of models, which outperform other ConvNets by a large margin.
+
+# Using ConvNets in the Real World
+
+## Using Open Source Implementations of CNN Architectures
+Most of the CNN architectures discussed here are finnicky to work with and difficult to replicate as they involve a ton of hyperparameter tuning which can affect the performance. I addition they also implement several tricks to ensure a high amount of efficiency on different CPU/GPU architectures. Due to this, in most cases it wouldn't even make sense to implement these from scratch unless you're masochistic to a certain extent.
+
+It is a good idea to use open source implementations from sources like GitHub, and Huggingface to build up on already existing work. This helps us get going with our ideas much faster than if we were to implement these from scratch.
+
+## Implementing Transfer Learning
+
+There has been loads of work done in the field of computer vision, due to which there is always a chance that someone has already pre-trained a model to perform a task similar to what you are working on. Like for instance, if we look at AlexNet, its uses aren't fixed just to identify stuff from the ImageNet dataset. It has been widely used in several domains of research and development.
+
+The weights and biases of a pre-trained model, owing to the predefined patterns learned from the previous datasets trained on, can now be trained on our current data to suit our use case. This is known as **transfer learning** and is widely used to help reduce computational costs. 
+
+In most cases the pretrained model has the original output classifier layer replaced with the softmax classifier for the current use case and trained a bit till the desired level of accuracy is obtained.
+
+For larger datasets, it is not as straightforward. We would need to freeze some of the lower layer values and only focus on training the later layers in the network. The larger the amount of data we have, the more the number of later layers we will have to train. In the case of a massive dataset, the whole network implementation itself with the pre-trained weights and biases can be used as the initialization (If you notice, this is a stand in for random initialization) and the whole network can be trained using these.
+
+## Data Augmentation
+
+CV tasks require a lot of data owing to the complexity of the functions that need to be learned. In a lot of cases, it is not easy to procure new data from our sources. Hence, this is where data augmentation comes into the picture to help improve the CV system.
+
+Some common data augmentation methods used in computer vision are
+- Mirroring on the vertical axis
+- Random cropping of the input images (assuming that the croppings are a reasonably large subset of the parent image)
+- Rotation, shearing, local warping, etc.
+- Color shifting: adding/subtracting to and from the RGB color channels of the image. These changes can be from a miniscule distribution of possible values. This makes the algorithm more robust to changes in color of the images.
+    - PCA color augmentation is one method used and has been implemented in AlexNet.
+
+These all have their own set of hyperparameters to choose from.
+
+# Conclusion
+
+We have seen how 
+
+<!-- Ensembling, multicrop at test time -->
+
 <!-- #### What are manifolds?
 
 Before moving further we must understand what a manifold is.
