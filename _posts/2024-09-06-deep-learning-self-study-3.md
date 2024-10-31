@@ -1870,7 +1870,9 @@ These all have their own set of hyperparameters to choose from.
 
 # Conclusion
 
-We have seen how 
+In this blogpost we have been introduced to the basic mathematical and architectural concepts behind a lot of famous computer vision applications, their implementations, and all the innovations and improvements that have been made on them over the years. All the concepts covered here are only just scratching the surface when it comes to this field of study. Computer vision is a really nuanced field with several subdomains that are actively being researched, and we have delved a bit into one of the domains here, image recognition.
+
+In the following blog posts we will be taking a bit of a deeper look into this field through another lens, image recognition.
 
 <!-- Ensembling, multicrop at test time -->
 
