@@ -1144,7 +1144,7 @@ $$y = x + f(x)$$
 
 This is because most of the features in the output $$y$$ is already present in the input and there is a only a small part in the form of the residual $$f(x)$$ capturing all the features in the input.
 
-Here, the **residual** refers to the *minute changes* that occur to the inputs as one traverses down the network as opposed to the whole feature itself.
+Here, the **residual** refers to the _minute changes_ that occur to the inputs as one traverses down the network as opposed to the whole feature itself.
 
 Consider the layers below taken from a several layer deep neural network.
 
@@ -1222,7 +1222,7 @@ Consider two more layers to be added to it , making it deeper.
 
 $$X \rightarrow \boxed{\text{Big NN}} \xrightarrow{a^{[l]}} \text{layer }[l+1] \rightarrow \text{layer }[l+2] \rightarrow a^{[l+2]}$$
 
-According to the ResNets {% cite DBLP:journals/corr/HeZRS15 %} paper, there exists a solution *by construction* to the deeper model
+According to the ResNets {% cite DBLP:journals/corr/HeZRS15 %} paper, there exists a solution _by construction_ to the deeper model
 
 The added layers are *"identity mapping"* and the other layers are copying from the learned shallower model which is acting as the "identity" here.
 
@@ -1828,7 +1828,7 @@ The idea of how one must go about scaling up convolutional neural networks was n
 
 > Is there a principled method to scale up ConvNets that can achieve better accuracy and efficiency?
 
-The authors of this paper proposed a *compound scaling method* where the various dimensions of the network, namely the
+The authors of this paper proposed a _compound scaling method_ where the various dimensions of the network, namely the
 - **Width** of the layers
 - **Depth** of the layers
 - **Resolution** of tje images
