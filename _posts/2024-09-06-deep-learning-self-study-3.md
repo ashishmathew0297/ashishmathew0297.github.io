@@ -2,7 +2,7 @@
 layout: post
 title: Deep Learning - Basics of Computer Vision (ConvNets)
 date: 2024-09-06 18:49:00
-description: "Topics covered: Convolutional Neural Network Foundations, Case Studies, Object Detection, Special applications (Face Recognition and Neural Style Transfer)."
+description: "Topics covered: Convolutional Neural Network Foundations, Case Studies."
 tags: machine-learning deep-learning computer-vision
 categories: deep-learning
 toc:
