@@ -2,7 +2,7 @@
 
 **Site Link**: [Here](https://ashishmathew0297.github.io/)
 
-This portfolio site was made from a fork of the [alshedivat/al-folio](https://github.com/alshedivat/al-folio) which has been used by many students and academics alike for various purposes. It is highly customizable, and with a bit of effort and motivation to learn something new (particularly Ruby, Jekyll/Liquid, Markdown, Latex, SCSS and HTML) it can be made into something either really interesting or REALLY intimidating.
+This portfolio site was made from a fork of [alshedivat/al-folio](https://github.com/alshedivat/al-folio) which has been used by many students and academics alike for various purposes. It is highly customizable, and with a bit of effort and motivation to learn something new (particularly Ruby, Jekyll/Liquid, Markdown, Latex, SCSS and HTML) it can be made into something either really interesting or REALLY intimidating.
 
 That aside, the point of this blog at the moment (As of mid to late 2024) is to write out/rant about all that I have understood while learning data science and deep learning related topics. I tend to be a bit pedantic and might go on a few tangents while writing out stuff here and this will not necesrily reflect on my academic writing or professional skills.
 
