@@ -5,7 +5,8 @@ description: Here I go a bit in depth on how some of the most well known deep le
 img: assets/project_bgs/project1_bg.jpg
 importance: 1
 category: work
-related_publications: true
+related_publications: false
+references: false
 ---
 
 [Here's](https://github.com/ashishmathew0297/optimization-algorithms) the link to the original notebook for you to tinker with. Some of the latex formulae will not render properly on this page due to compatibility issues with Mathjax. Running the notebook locally or viewing it on github will render the formulae properly.
