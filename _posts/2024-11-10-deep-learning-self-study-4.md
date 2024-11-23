@@ -123,8 +123,31 @@ We can use ConvNets to perform object detection tasks using a mechanism known as
 
 Our dataset can consist of closely cropped examples of images belonging to different classes mixed in with images having no labelled objects in them. Using this, a ConvNet can train on these images to output a prediction $$\hat{y}$$.
 
-## Sliding Windows Detection
+## Sliding Window Object Detection
 
 With a trained ConvNet, we can implement a sliding window mechanism on our test image to detect instances of a predicted object. The process of this algorithm is as follows
 
-- Select a window size and input a small region of the image bounded by the window into the ConvNet.
+- Select a window size and input a small region of the image bounded by the given window into the ConvNet.
+- Once you receive a prediction for the given region bounded by the rectangle, move onto another region next to the previous position, feed it into the ConvNet and perform a prediction again.
+- Repeat this process for several regions on the image till every position has been covered. This can be seen to be working in a similar way to how convolution kernels move along an image with variable strides.
+- Now, repeat this process with larger windows.
+
+The idea here is that if there is an object that we are looking for present in the image, there will be a window where the window can output a $$1$$ for that region.
+
+### Disadvantage of the Sliding Window approach
+
+The main disadvantage here is the computational cost, as we are performing a prediction at several positions on our image with varying window sizes.
+
+Using a coarse window stride can't reduce the effective number of windows we need to pass through the network, but this will lead to a tradeoff with the model performance. Similarly, using a small stride would lead to a huge number of regions being fed into the ConvNet, which will increase the computation time.
+
+In classical approaches, these sliding windows were seen as a better approach since the models used were much more straightforward and less computationally taxing.
+
+With ConvNets, this changes, and sliding windows prove to be slow and using larger strides would just lead to a lower accuracy. Hence, this implementation was changed for ConvNets.
+
+# Sliding Windows with ConvNets
+
+We will now see how we can implement sliding windows with Convolutional Networks.
+
+$$2 \times 2 \times 400$$
+
+$$24 \times 24$$
