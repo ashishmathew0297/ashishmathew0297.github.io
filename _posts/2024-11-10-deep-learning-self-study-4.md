@@ -165,10 +165,16 @@ Now, we change the final softmax layer to show four numbers corresponding to the
 
 Taking the layer between the $$(5,5,16)$$ input to the $$400$$ unit fully connected output as an example, to convert the fully connected layer into a convolutional layer, we use $$400$$ $$5 \times 5$$ filters. This because when we implement the $$5 \times 5$$ filter, it is implemented as $$5 \times 5 \times 16$$ as it is looking at all the channels and must match the outputs. Each convolution operation imposes a $$5 \times 5$$ filter on top of the $$5 \times 5 \times 16$$ feature mapping, giving us a $$1 \times 1$$ output.
 
-Hence, we can say that the $$400$$ node fully connected layer is equivalent to a $$1 \times 1 \times 400$$ volume. This is mathematically the same as a fully connected layer.
+Hence, we can say that the $$400$$ node fully connected layer is equivalent to a $$1 \times 1 \times 400$$ volume. This is mathematically the same as a fully connected layer as each node corresponds to a filter of $$5 \times 5 \times 16$$.
+
+Similarly, for the second fully connected layer, we perform a $$1 \times 1$$ convolution on the $$1 \times 1 \times 400$$ volume with $$400$$ filters., giving us a $$1 \times 1 \times 400$$ output. The layer after that will also be a $$1 \times 1$$ layer followed by the softmax output.
+
+This forms the basis of sliding windows in object detection.
+
+## Implementing Convolutional sliding windows
 
 
-Which is equivalent to 
+
 
 $$2 \times 2 \times 400$$
 
