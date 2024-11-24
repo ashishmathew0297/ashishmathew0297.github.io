@@ -148,6 +148,28 @@ With ConvNets, this changes, and sliding windows prove to be slow and using larg
 
 We will now see how we can implement sliding windows with Convolutional Networks.
 
+## Converting Fully Connected Layers into Convolutional Layers
+
+Take the following network structure into consideration
+
+| Inputs         | No. and Type of Filters | Kernel Size | Output     |
+| -------------- | ----------------------- | ----------- | ---------- |
+| (14,14,3)      | 16 (CONV)               | 5           | (10,10,16) |
+| (10,10,16)     | 1  (MAX POOL)           | 2           | (5,5,16)   |
+| (5,5,16)     | 400 UNITS  (FC)         | NA          | 400        |
+| 400            | 400 UNITS  (FC)         | NA          | 400        |
+| 400            | 4 UNITS  (SOFTMAX)      | NA          | 4          |
+
+
+Now, we change the final softmax layer to show four numbers corresponding to the probabilities of the softmax output.
+
+Taking the layer between the $$(5,5,16)$$ input to the $$400$$ unit fully connected output as an example, to convert the fully connected layer into a convolutional layer, we use $$400$$ $$5 \times 5$$ filters. This because when we implement the $$5 \times 5$$ filter, it is implemented as $$5 \times 5 \times 16$$ as it is looking at all the channels and must match the outputs. Each convolution operation imposes a $$5 \times 5$$ filter on top of the $$5 \times 5 \times 16$$ feature mapping, giving us a $$1 \times 1$$ output.
+
+Hence, we can say that the $$400$$ node fully connected layer is equivalent to a $$1 \times 1 \times 400$$ volume. This is mathematically the same as a fully connected layer.
+
+
+Which is equivalent to 
+
 $$2 \times 2 \times 400$$
 
 $$24 \times 24$$
