@@ -156,16 +156,19 @@ Take the following network structure into consideration
 | -------------- | ----------------------- | ----------- | ---------- |
 | (14,14,3)      | 16 (CONV)               | 5           | (10,10,16) |
 | (10,10,16)     | 1  (MAX POOL)           | 2           | (5,5,16)   |
-| (5,5,16)     | 400 UNITS  (FC)         | NA          | 400        |
+| (5,5,16)       | 400 UNITS  (FC)         | NA          | 400        |
 | 400            | 400 UNITS  (FC)         | NA          | 400        |
 | 400            | 4 UNITS  (SOFTMAX)      | NA          | 4          |
 
 
 Now, we change the final softmax layer to show four numbers corresponding to the probabilities of the softmax output.
 
-Taking the layer between the $$(5,5,16)$$ input to the $$400$$ unit fully connected output as an example, to convert the fully connected layer into a convolutional layer, we use $$400$$ $$5 \times 5$$ filters. This because when we implement the $$5 \times 5$$ filter, it is implemented as $$5 \times 5 \times 16$$ as it is looking at all the channels and must match the outputs. Each convolution operation imposes a $$5 \times 5$$ filter on top of the $$5 \times 5 \times 16$$ feature mapping, giving us a $$1 \times 1$$ output.
+Taking the layer between the $$(5,5,16)$$ input from the MAX POOL layer to the $$400$$ unit fully connected output as an example:
 
-Hence, we can say that the $$400$$ node fully connected layer is equivalent to a $$1 \times 1 \times 400$$ volume. This is mathematically the same as a fully connected layer as each node corresponds to a filter of $$5 \times 5 \times 16$$.
+- To convert the fully connected layer into a convolutional layer, we use $$400$$ $$5 \times 5$$ filters.
+- This because when we implement the $$5 \times 5$$ filter, it is implemented as $$5 \times 5 \times 16$$ as it is looking at all the channels and must match the outputs.
+- Each convolution operation imposes a $$5 \times 5$$ filter on top of the $$5 \times 5 \times 16$$ feature mapping, giving us a $$1 \times 1$$ output.
+- We can say that the $$400$$ node fully connected layer is equivalent to a $$1 \times 1 \times 400$$ volume. This is mathematically the same as a fully connected layer as each node corresponds to a filter of $$5 \times 5 \times 16$$.
 
 Similarly, for the second fully connected layer, we perform a $$1 \times 1$$ convolution on the $$1 \times 1 \times 400$$ volume with $$400$$ filters., giving us a $$1 \times 1 \times 400$$ output. The layer after that will also be a $$1 \times 1$$ layer followed by the softmax output.
 
@@ -173,9 +176,29 @@ This forms the basis of sliding windows in object detection.
 
 ## Implementing Convolutional sliding windows
 
+Consider a $$14 \times 14 \times 3$$ input put through the following architecture
+
+| Inputs         | No. and Type of Filters | Kernel Size | Output     |
+| -------------- | ----------------------- | ----------- | ---------- |
+| (14,14,3)      | 16 (CONV)               | 5           | (10,10,16) |
+| (10,10,16)     | 1  (MAX POOL)           | 2           | (5,5,16)   |
+| (5,5,16)       | 400 (CONV -> FC)        | 5           | 400        |
+| 400            | 400 (CONV -> FC)        | 1           | 400        |
+| 400            | 4 (CONV -> FC)          | 1           | 4          |
 
 
+Given the test set having $$16 \times 16 \times 3$$, we could use a stride of 2 and run the conv net $$4$$ times on the given image to get 4 labels. However, this would be redundant because there would be many calculations occurring that are shared between each of the separate windows.
 
-$$2 \times 2 \times 400$$
+To mitigate this, instead of cropping out each region of the image and feeding it into the network, we just directly run the above architecture on the test image (with the exact same stride and other hyperparameters). The calculations for each layer would look something like the following
+
+| Inputs         | No. and Type of Filters | Kernel Size | Output     |
+| -------------- | ----------------------- | ----------- | ---------- |
+| (16,16,3)      | 16 (CONV)               | 5           | (12,12,16) |
+| (12,12,16)     | 1  (MAX POOL)           | 2           | (6,6,16)   |
+| (6,6,16)       | 400 (CONV -> FC)        | 5           | (2,2,400)  |
+| (2,2,400)      | 400 (CONV -> FC)        | 1           | (2,2,400)  |
+| (2,2,400)      | 4 (CONV -> FC)          | 1           | (2,2,4)    |
+
+As we can see here we get a $$2 \times 2 \times 4$$ output at the end. Each of the corners here can be seen as a 
 
 $$24 \times 24$$
