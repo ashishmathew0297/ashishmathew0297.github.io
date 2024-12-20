@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Deep Learning - Improving Deep Neural Networks
-date: 2024-07-22 10:58:00
+date: 2024-10-22 10:58:00
 description: "Topics covered: Deep Learning in practice, Optimization Algorithms, Hyperparameter Tuning, and Batch Normalization."
 tags: machine-learning deep-learning
 categories: deep-learning
@@ -119,7 +119,7 @@ In the era of deep learning, a large network is enough to reduce the bias when w
 
 Obtaining more training data is normally what one would do if they wanted to combat the variance, however, obtaining more training data in the real-world is not always feasible. This is where regularization finds its role.
 
-For this section we will use logistic regression as an example. We have already seen in the [previous blog]({{site.baseurl}}{% link _posts/2024-06-30-deep-learning-self-study-1.md %}), that the main goal of logistic regression is to minimize the cost function $$J(w,b)$$ based on the model's decisions
+For this section we will use logistic regression as an example. We have already seen in the [previous blog]({{site.baseurl}}{% link _posts/2024-09-17-deep-learning-self-study-1.md %}), that the main goal of logistic regression is to minimize the cost function $$J(w,b)$$ based on the model's decisions
 
 $$
 J(w,b) = \frac{1}{m}\sum\limits_{i=1}^{m}L(\hat{y}^{(i)}, y^{(i)})
