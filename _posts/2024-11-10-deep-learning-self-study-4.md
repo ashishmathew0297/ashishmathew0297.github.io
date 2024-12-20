@@ -186,8 +186,16 @@ Consider a $$14 \times 14 \times 3$$ input put through the following architectur
 | 400            | 400 (CONV -> FC)        | 1           | 400        |
 | 400            | 4 (CONV -> FC)          | 1           | 4          |
 
+<div class="row justify-content-center mt-3">
+    <div class="col-12 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/sliding_window_model.png" class="img-fluid rounded z-depth-1" zoomable=true%}
+    </div>
+</div>
+<div class="caption">
+    A visualization of the above model. Note the output not containing the softmax we would normally place there.
+</div>
 
-Given the test set having $$16 \times 16 \times 3$$, we could use a stride of 2 and run the conv net $$4$$ times on the given image to get 4 labels. However, this would be redundant because there would be many calculations occurring that are shared between each of the separate windows.
+Given a test set having $$16 \times 16 \times 3$$, a naive approach would be to use a stride of 2 and run the above model $$4$$ times on the given image to get 4 labels. This would be redundant as there many calculations would be shared between each of the separate windows.
 
 To mitigate this, instead of cropping out each region of the image and feeding it into the network, we just directly run the above architecture on the test image (with the exact same stride and other hyperparameters). The calculations for each layer would look something like the following
 
@@ -199,6 +207,63 @@ To mitigate this, instead of cropping out each region of the image and feeding i
 | (2,2,400)      | 400 (CONV -> FC)        | 1           | (2,2,400)  |
 | (2,2,400)      | 4 (CONV -> FC)          | 1           | (2,2,4)    |
 
-As we can see here we get a $$2 \times 2 \times 4$$ output at the end. Each of the corners here can be seen as a 
+<div class="row justify-content-center mt-3">
+    <div class="col-12 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/sliding_window_application.png" class="img-fluid rounded z-depth-1" zoomable=true%}
+    </div>
+</div>
+<div class="caption">
+    A visualization of the above model applied to the test image.
+</div>
 
-$$24 \times 24$$
+As we can see, we get a $$2 \times 2 \times 4$$ output at the end. Here, each of the corners can be seen as an fully connected layer output corresponding to a $$14 \times 14$$ section of the original image with a stride of $$2$$. The stride can be changed by varying the kernel size of the Max Pool layer.
+
+Hence, instead of running the forward propagation on four subsets of the input image independently, the computations can be combined into a single forward pass on the whole image.
+
+# Predicting bounding boxes
+
+In the previous method, though we are able to implement sliding windows on our image, the position of the bounding boxes are not necessarily accurate. The code above only implements square bounding boxes with fixed strides, which can be inaccurate in case our image contains an object that doesn't completely fit in our given bounding box.
+
+The solution for this is the YOLO algorithm.
+
+Consider an input $$100 \times 100$$ image, the YOLO algorithm aplits the image up into a grid. Upon each of the grid cells, we apply our classification and localization algorithm. This algorithm has the following labels
+
+
+$$
+y = \begin{bmatrix}
+P_c \\ bx \\ by \\ bh \\ bw \\ c_1 \\ c_2 \\ \vdots
+\end{bmatrix}
+$$
+
+Refer to [Defining the target](#defining-the-target) for a breakdown of this format.
+
+In this case, our target output will have the dimension of $$n \times n \times 8$$ with $$n$$ being the number of grid cells per row/column.
+
+We would have to run our ConvNet model on our inputs such that the output obtained at the end is the required $$n \times n \times 8$$ output volume
+
+Objects are assigned to a grid cell based on its center point's position being contained in the corresponding grid, even if it spans multiple grid cells. Using finer grids helps us avoid multiple objects being captured within a single grid cell.
+
+Since this is convolutionally applied, the computations here are fairly quick, which makes the YOLO algorithm fairly popular, even finding use in real-time object detection.
+
+## Encoding the Bounding Boxes
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/grid_cat.jpg" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+    A grid box applied to the cat image example from before.
+</div>
+
+The the example of the cat above. Here, the object has a target label $$P_c$$ of $$1$$ followed by the bounding box values followed by the labeel, which in this case we take as the first label $$c_1 = 1$$. Hence, the vector at hand beomes
+
+$$
+y = \begin{bmatrix}
+1 \\ bx \\ by \\ bh \\ bw \\ 1 \\ 0
+\end{bmatrix}
+$$
+
+In the YOLO algorithm, considering the upper left corner of the grid square containing the cat to be $$(0,0)$$ and the lower right point to be $$(1,1)$$, the height is specified as a fraction of the total height of the box, the same being with the width. Effectively, all the calculations here are done relative to the width and height of the grid section.
+
+The values can go greater than one since it is a possibility that the given object spans several cells. This is just one of many ways to specify the bounding box.
