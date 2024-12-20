@@ -119,7 +119,7 @@ In the era of deep learning, a large network is enough to reduce the bias when w
 
 Obtaining more training data is normally what one would do if they wanted to combat the variance, however, obtaining more training data in the real-world is not always feasible. This is where regularization finds its role.
 
-For this section we will use logistic regression as an example. We have already seen in the [previous blog]({{site.baseurl}}{% link _posts/2024-09-07-deep-learning-self-study-1.md %}), that the main goal of logistic regression is to minimize the cost function $$J(w,b)$$ based on the model's decisions
+For this section we will use logistic regression as an example. We have already seen in the [previous blog]({{site.baseurl}}{% link _posts/2024-09-17-deep-learning-self-study-1.md %}), that the main goal of logistic regression is to minimize the cost function $$J(w,b)$$ based on the model's decisions
 
 $$
 J(w,b) = \frac{1}{m}\sum\limits_{i=1}^{m}L(\hat{y}^{(i)}, y^{(i)})

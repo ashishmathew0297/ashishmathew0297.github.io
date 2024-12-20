@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Deep Learning - An Introduction
-date: 2024-09-7 16:40:16
+date: 2024-09-17 16:40:16
 description: "Topics covered: Introduction to Neural Networks and the underlying mathematics behind the training process for shallow and deep Artificial Neural Networks."
 tags: machine-learning deep-learning
 categories: deep-learning
