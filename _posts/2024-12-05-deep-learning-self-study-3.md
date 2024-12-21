@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Deep Learning - Basics of Computer Vision (ConvNets)
-date: 2024-09-06 18:49:00
+date: 2024-12-05 18:49:00
 description: "Topics covered: Convolutional Neural Network Foundations, Case Studies."
 tags: machine-learning deep-learning computer-vision
 categories: deep-learning
@@ -53,7 +53,7 @@ The best explanations of the convolution operation in signal processing that I h
 
 <br>
 
-There are several ways of picturing what a convolution is and how it works. It even ties into moving averages which was discussed in the [previous blog]({{site.baseurl}}{% link _posts/2024-07-22-deep-learning-self-study-2.md %}).
+There are several ways of picturing what a convolution is and how it works. It even ties into moving averages which was discussed in the [previous blog]({{site.baseurl}}{% link _posts/2024-10-22-deep-learning-self-study-2.md %}).
 
 The official formulaic definition for the convolution of two different functions is as follows
 
