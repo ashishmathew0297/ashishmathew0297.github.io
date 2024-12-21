@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Deep Learning - Object Detection
-date: 2024-11-10 12:00:00
+date: 2024-12-10 12:00:00
 description: "Topics covered: Object Detection Algorithms."
 tags: machine-learning deep-learning computer-vision
 categories: deep-learning
@@ -267,3 +267,49 @@ $$
 In the YOLO algorithm, considering the upper left corner of the grid square containing the cat to be $$(0,0)$$ and the lower right point to be $$(1,1)$$, the height is specified as a fraction of the total height of the box, the same being with the width. Effectively, all the calculations here are done relative to the width and height of the grid section.
 
 The values can go greater than one since it is a possibility that the given object spans several cells. This is just one of many ways to specify the bounding box.
+
+# Intersection over union
+
+This is a way to evaluate our object detection algorithm to determine how well it is performing.
+
+Object detection involves localizing an object alongside recognizing it. Consider the image below with the green box being the ground truth bounding box and the red box being the predicted bounding box.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/cat_iou.jpg" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+    Here, green is the ground truth bounding boc and red is the predicted bounding box.
+</div>
+
+The **intersection over union (IoU)** function computes the intersection over union of the two bounding boxes, which is as follows
+
+$$
+\text{IoU} = \frac{\text{Size of the bounding boxes intersection}}{\text{Size of the bounding boxes union}}
+$$
+
+Conventionally a the answer is taken to be correct if the IoU value is greater than $$0.5$$. In the case of the bounding boxes overlapping perfectly, the IoU is $$1$$. The threshold value can be changed if we are looking for more accurate bounding boxes.
+
+IoU measures the overlap between the bounding boxes to see how similar they are to each other.
+
+# Non-max supression
+
+Non-max supression is a way to deal with the issue of object detection algorithms detecting of multiple of the same object. It ensures that each object is detected only once.
+
+Considering the image below, despite the center point lying inside a grid square, it is possible for our model to have several positives around the grid containing the center point.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/cat_iou.jpg" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+    Here, green is the ground truth bounding box and red is the predicted bounding box.
+</div>
+
+Since image classification and localization is being applied to every grid cell, many of them can give a positive for the chance of detecting an object, hence giving us multiple detections. Non-max supression cleans up the detections to give just one detection per object.
+
+Here, it looks at the probabilities of each of the repeated detections, takes the larget one and sets it as the label. It then looks at all the remaining rectangles with high overlap and supresses them.
+
+So, in the above example, we get a $$19 \times 19 \times 8$$ output for which we have the prediction as 
