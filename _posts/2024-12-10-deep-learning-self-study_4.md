@@ -310,6 +310,16 @@ Considering the image below, despite the center point lying inside a grid square
 
 Since image classification and localization is being applied to every grid cell, many of them can give a positive for the chance of detecting an object, hence giving us multiple detections. Non-max supression cleans up the detections to give just one detection per object.
 
-Here, it looks at the probabilities of each of the repeated detections, takes the larget one and sets it as the label. It then looks at all the remaining rectangles with high overlap and supresses them.
+Here, it looks at the probabilities of each of the repeated detections, takes the largest one and sets it as the label. It then looks at all the remaining rectangles with high overlap and supresses them.
 
-So, in the above example, we get a $$19 \times 19 \times 8$$ output for which we have the prediction as 
+So, in the above example, we get a $$19 \times 19 \times 8$$ output for which we have the prediction is given as
+
+$$
+y = \begin{bmatrix}
+P_c \\ bx \\ by \\ bh \\ bw
+\end{bmatrix}
+$$
+
+since we are only considering the detection of a cat here.
+
+The first step the algorithm takes is to discard all boxes with $$P_c$$ values below the threshold
