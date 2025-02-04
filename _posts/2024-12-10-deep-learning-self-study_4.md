@@ -166,7 +166,7 @@ Now, we change the final softmax layer to show four numbers corresponding to the
 Taking the layer between the $$(5,5,16)$$ input from the MAX POOL layer to the $$400$$ unit fully connected output as an example:
 
 - To convert the fully connected layer into a convolutional layer, we use $$400$$ $$5 \times 5$$ filters.
-- This because when we implement the $$5 \times 5$$ filter, it is implemented as $$5 \times 5 \times 16$$ as it is looking at all the channels and must match the outputs.
+- This is because when we implement the $$5 \times 5$$ filter, it is implemented as $$5 \times 5 \times 16$$ as it is looking at all the channels and must match the outputs.
 - Each convolution operation imposes a $$5 \times 5$$ filter on top of the $$5 \times 5 \times 16$$ feature mapping, giving us a $$1 \times 1$$ output.
 - We can say that the $$400$$ node fully connected layer is equivalent to a $$1 \times 1 \times 400$$ volume. This is mathematically the same as a fully connected layer as each node corresponds to a filter of $$5 \times 5 \times 16$$.
 
@@ -222,24 +222,43 @@ Hence, instead of running the forward propagation on four subsets of the input i
 
 # Predicting bounding boxes
 
-In the previous method, though we are able to implement sliding windows on our image, the position of the bounding boxes are not necessarily accurate. The code above only implements square bounding boxes with fixed strides, which can be inaccurate in case our image contains an object that doesn't completely fit in our given bounding box.
+In the previous method, though we are able to implement sliding windows on our image, the position of the bounding boxes are not necessarily accurate.
 
-The solution for this is the YOLO algorithm.
+The code above only implements square bounding boxes with fixed strides, which can be inaccurate in case our image contains an object that doesn't completely fit in our given bounding box. It could be present on the line between two boxes, and it might not even be square in shape, but more rectangular.
 
-Consider an input $$100 \times 100$$ image, the YOLO algorithm aplits the image up into a grid. Upon each of the grid cells, we apply our classification and localization algorithm. This algorithm has the following labels
+The solution for this is the **YOLO algorithm**.
 
+Consider an input $$100 \times 100$$ image with three classes to choose from. The YOLO algorithm aplits the image up into a grid, and the classification and localization algorithm is applied to each of the cells. This algorithm will have the following labels
 
 $$
 y = \begin{bmatrix}
-P_c \\ bx \\ by \\ bh \\ bw \\ c_1 \\ c_2 \\ \vdots
+P_c \\ bx \\ by \\ bh \\ bw \\ c_1 \\ c_2 \\ c_3
+\end{bmatrix}
+$$
+
+Any cells not containing an object of interest will be labeled with
+
+$$
+y = \begin{bmatrix}
+0 \\ ? \\ ? \\ ? \\ ? \\ ? \\ ? \\ ?
+\end{bmatrix}
+$$
+
+and if an object of interest is actually present in the cells, then we will get
+
+$$
+y = \begin{bmatrix}
+1 \\ bx \\ by \\ bh \\ bw \\ 0 \\ 1 \\ 0
 \end{bmatrix}
 $$
 
 Refer to [Defining the target](#defining-the-target) for a breakdown of this format.
 
-In this case, our target output will have the dimension of $$n \times n \times 8$$ with $$n$$ being the number of grid cells per row/column.
+In this case, our target output will have the dimension of $$n \times n \times 8$$ with $$n$$ being the number of grid cells per row/column. So, if we had $$3 \times 3$$ grid cells, our target would be $$3 \times 3 \times 8$$.
 
-We would have to run our ConvNet model on our inputs such that the output obtained at the end is the required $$n \times n \times 8$$ output volume
+We would take our ConvNet model, run it on our inputs such that the output obtained at the end is the required $$3 \times 3 \times 8$$ output volume.
+
+The advantage here is that the model will give us precise bounding boxes.
 
 Objects are assigned to a grid cell based on its center point's position being contained in the corresponding grid, even if it spans multiple grid cells. Using finer grids helps us avoid multiple objects being captured within a single grid cell.
 
@@ -264,40 +283,17 @@ y = \begin{bmatrix}
 \end{bmatrix}
 $$
 
-In the YOLO algorithm, considering the upper left corner of the grid square containing the cat to be $$(0,0)$$ and the lower right point to be $$(1,1)$$, the height is specified as a fraction of the total height of the box, the same being with the width. Effectively, all the calculations here are done relative to the width and height of the grid section.
+In the YOLO algorithm, considering the upper left corner of the grid square containing the cat to be $$(0,0)$$ and the lower right point to be $$(1,1)$$, the height is specified as a **fraction of the total height of the grid cell**, the same being with the width. Effectively, all the calculations here are done relative to the width and height of the grid section.
 
-The values can go greater than one since it is a possibility that the given object spans several cells. This is just one of many ways to specify the bounding box.
+The values can go greater than one since it is a possibility that the given object spans several cells. This is just one of many ways to specify the bounding box. Later versions of YOLO go into these.
 
 # Intersection over union
 
 This is a way to evaluate our object detection algorithm to determine how well it is performing.
 
-Object detection involves localizing an object alongside recognizing it. Consider the image below with the green box being the ground truth bounding box and the red box being the predicted bounding box.
+Object detection involves **localizing** an object alongside recognizing it.
 
-<div class="row justify-content-center mt-3">
-    <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/cat_iou.jpg" class="img-fluid rounded z-depth-1" %}
-    </div>
-</div>
-<div class="caption">
-    Here, green is the ground truth bounding boc and red is the predicted bounding box.
-</div>
-
-The **intersection over union (IoU)** function computes the intersection over union of the two bounding boxes, which is as follows
-
-$$
-\text{IoU} = \frac{\text{Size of the bounding boxes intersection}}{\text{Size of the bounding boxes union}}
-$$
-
-Conventionally a the answer is taken to be correct if the IoU value is greater than $$0.5$$. In the case of the bounding boxes overlapping perfectly, the IoU is $$1$$. The threshold value can be changed if we are looking for more accurate bounding boxes.
-
-IoU measures the overlap between the bounding boxes to see how similar they are to each other.
-
-# Non-max supression
-
-Non-max supression is a way to deal with the issue of object detection algorithms detecting of multiple of the same object. It ensures that each object is detected only once.
-
-Considering the image below, despite the center point lying inside a grid square, it is possible for our model to have several positives around the grid containing the center point.
+Consider the image below with the green box being the ground truth bounding box and the red box being the predicted bounding box.
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
@@ -308,12 +304,54 @@ Considering the image below, despite the center point lying inside a grid square
     Here, green is the ground truth bounding box and red is the predicted bounding box.
 </div>
 
-Since image classification and localization is being applied to every grid cell, many of them can give a positive for the chance of detecting an object, hence giving us multiple detections. Non-max supression cleans up the detections to give just one detection per object.
+The **intersection over union (IoU)** function computes the intersection over union of the two bounding boxes, which is as follows
 
-Here, it looks at the probabilities of each of the repeated detections, takes the largest one and sets it as the label. It then looks at all the remaining rectangles with high overlap and supresses them.
+$$
+\text{IoU} = \frac{\text{Bounding box intersection area}}{\text{Bounding box union area}}
+$$
 
-So, in the above example, we get a $$19 \times 19 \times 8$$ output for which we have the prediction is given as
+Conventionally a the answer is taken to be correct if the IoU value is greater than $$0.5$$.
 
+In the case of the bounding boxes overlapping perfectly, the IoU is $$1$$. The threshold value can be changed if we are looking for more accurate bounding boxes, but it can also lead to longer training times.
+
+## IoU: Sets Intuition
+
+Putting this in terms of sets makes it a bit easier to understand. Refer to the image below.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/set_example.jpg" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+
+Consider the case where our bounding boxes are in the form of sets that intersect one another. This intersection's value can change as the boxes get closer. The ideal condition for our bounding boxes would be for our intersection to be equal to the union, or as close to it as possible.
+
+Hence, by taking the ratio of the **intersection over union** we can study how close our bounding boxes would be to the ground truth.
+
+# Non-max supression
+
+Non-max supression our object detection algorithms detects the same object only once
+
+Considering the image below, despite the center point lying inside a grid square, it is possible for our model to have several positives around the grid containing the center point.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/non_max_eg1.jpg" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+
+Since image classification and localization is being applied to every grid cell, many of them can give a positive for the chance of detecting an object, hence giving us multiple detections. Non-max supression gives us one detection per object.
+
+Here, non-max supression looks at the probabilities of each of the repeated detections, takes the largest one and sets it as the label. It then supresses the remaining rectangles.
+
+
+Looking at it grammatically, we could say that all the probabilities that are **not max** are **supressed**.
+
+## The algorithm
+
+So, in the above example, we get a $$19 \times 19 \times 8$$ output for which we have the prediction is given as.
+
+We consider each of the output predictions to be
 $$
 y = \begin{bmatrix}
 P_c \\ bx \\ by \\ bh \\ bw
@@ -322,4 +360,213 @@ $$
 
 since we are only considering the detection of a cat here.
 
-The first step the algorithm takes is to discard all boxes with $$P_c$$ values below the threshold
+- The first step: Discard all boxes with $$P_c$$ values less than equal to the threshold set by us.
+- Pick the box with the largest $$P_c$$ as the output.
+- With the remaining predictions, discard any having an $$\text{IoU} \ge 0.5$$.
+- repeat this with boxes that have not yet been processed till each is either output as a prediction or discarded.
+
+
+For images having multiple objects, the output vector's size increases proportionally, so non-max supression is carried out three times independently.
+
+# Anchor boxes
+
+This mechanism helps detect multiple objects in a single grid cell.
+
+Consider the image below where we have the bounding boxes for a dog and couch.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/doge_anchor.jpg" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+
+here we see that the midpoints for each are almost at the same place, in the same grid cell. So, for our output vector
+
+$$
+y = \begin{bmatrix}
+P_c \\ bx \\ by \\ bh \\ bw \\ c_1 \\ c_2
+\end{bmatrix}
+$$
+
+it is difficult to get two classes in the same box simultaneously.
+
+**Anchor boxes** predefine two different shapes/boxes and associate different predictions with them. So, instead of the vector being as the above, we set it to be
+
+$$
+y = \left[\begin{matrix}
+P_c \\ bx \\ by \\ bh \\ bw \\ c_1 \\ c_2 \\ \hline P_c \\ bx \\ by \\ bh \\ bw \\ c_1 \\ c_2
+\end{matrix}\right]
+$$
+
+Where each following set of outputs is related to an anchor box. So if we had bounding boxes like
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/anchor_boxes.jpg" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+
+The first one would be used to encode the doge and the second would be used to encode the couch.
+
+So,
+
+> #### Previously
+> Each object was assigned to a grid cell containing its mid point
+{: .block-danger }
+
+> #### Now: With Two Anchor Boxes
+> Each object is assigned to a grid cell containing its mid point AND anchor box for the grid cell with the highest IoU
+{: .block-tip }
+
+If we have two anchor boxes but multiple objects in a grid cell, **our algorithm will start to struggle**. Here we would have to use something like a tiebreaker.
+
+Another case is if we had two objects in the same grid cell but with similar anchor box shapes, this will also lead to our algorithm struggling.
+
+These are fairly rare to see.
+
+Anchor boxes help specialize out algorithm for specific use cases.
+
+#### Choosing Anchor Boxes
+
+The classical way was to do it by hand in a variety of shapes.
+
+In later YOLO papers, the **K-means** algorithm was used to group together types of objects one would get and use that to select the anchor boxes that would represent the classes we are trying to represent.
+
+# The YOLO Algorithm
+
+Typing up all the concepts we discussed before, we can now study how the YOLO algorithm works.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/yolo_1.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+    This image was taken from Coursera.
+</div>
+
+Here we are trying to detect
+- Pedestrians
+- Cars
+- Motorcycles
+
+If we use two anchor boxes, we will have the output vector as $$3 \times 3 \times 2 \times 8$$
+
+For our training set, we go through each of the $$9$$ grid cells and form the appropriate target vector $$y$$.
+
+For all the empty grid cells we would get
+
+$$
+y = \left[\begin{matrix}
+0 \\ ? \\ ? \\ ? \\ ? \\ ? \\ ? \\ ? \\ \hline 0 \\ ? \\ ? \\ ? \\ ? \\ ? \\ ? \\ ?
+\end{matrix}\right]
+$$
+
+and for cells containing an object we would get
+
+$$
+y = \left[\begin{matrix}
+0 \\ ? \\ ? \\ ? \\ ? \\ ? \\ ? \\ ? \\ \hline 1 \\ b_x \\ b_y \\ b_h \\ b_w \\ 0 \\ 1 \\ 0
+\end{matrix}\right]
+$$
+
+So, we basically train a ConvNet that inputs an image of, say, $$100 \times 100 \times 3$$ to an output of $$3 \times 3 \times 2 \times 8$$
+
+## How we make predictions
+
+Given an image with a grid, we get the $$3 \times 3 \times 2 \times 8$$ output for each of the grid cells, giving us relevant outputs for each.
+
+Finally, we run the network through non-max supression:
+- If using two anchor boxes, for each grid cell, we get two predicted bounding boxes with varying $$P_c$$.
+- Get rid of the low probability predictions.
+- When trying to detect 3 classes, for each class, uses non-max supression to get the final predictions.
+
+This is one of the most effective object detection algorithms encompassing some of the best ideas across CV literature related to object detection
+
+# Region Proposal: R-CNN
+
+Looking back at sliding windows, we would take a small window thoughout an image and train a classifier on each of them.
+
+The main downside is the training time and reclassifying regions where there is no object.
+
+Here is where R-CNNs, or regions with CNNs come in. Here it tries to pich just a few windows where it would run the CNN classifier.
+
+This is done with the help of a **segmentation algorithm** to figure out what could be objects and run the classifier around just those blobs
+
+R-CNNs are still pretty slow, so faster algorithms have been developed:
+- **R-CNN:** Propose regions, classify on them one by one, output label + bounding box.
+- **Fast R-CNN:** Propose regions, Use convolutional implementation of sliding windows to classify proposed regions. (Drawback: the clustering step to propose regions is slow)
+- **Faster R-CNN:** Use CNN to propose regions.
+
+These are all still a bit slower than the YOLO algorithm.
+
+# U-Net (Semantic Segmentation)
+
+All the examples till now have dealt with objext recognition and detection. Now we will look at **semantic segmentation**.
+
+Segmentation outlines the object to know which pixels _exactly_ belong to the object and which don't rather than using bounding boxes.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/semseg_eg.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+<div class="caption">
+    Source: https://medium.com/hackabit/semantic-segmentation-8f2900eff5c8
+</div>
+
+One of the uses of semantic segmentation is in self driving cars to know which exact pixels are safe to drive on.
+
+Other uses include chest x-ray studies, brain MRI scans
+
+## What Semantic segmentation does
+
+Consider the given image where we want to segment out the woman who's angry at something (I wonder what).
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/angry_woman.jpg" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+
+Here we would have two class labels, 1 for the woman and 0 for nothing. Below, I have only marked the woman since marking the whole image wouldn't be worth the effort.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/angry_woman_1.jpg" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+
+The segmentation algorithm outputs 1 or 0 for every pixel in the image if it is part of the object we are interested in.
+
+Similar to previous examples, we can use multiple labels for different classes of pixels.
+
+So, our network will have to generate a matrix of labels.
+
+## Building a semantic segmentation network
+
+Consider the CNN below
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/CNN_UNet.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+
+We now want to make the output of this a whole matrix of class labels.
+
+What we do is eliminate the last few fully connected layers.
+
+Now, as we go down a network, the size of the image gradually goes down. We now need to blow the size of our image back up.
+
+The architecture will represent something like below where, as we go deeper, the height and width go back up while the number of channels decreases.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/CNN_UNet_2.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+
+This blowing up mechanism is done with the help of **transpose convolutions**.
+
+## Transpose Convolutions
