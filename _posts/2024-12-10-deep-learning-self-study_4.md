@@ -570,3 +570,108 @@ The architecture will represent something like below where, as we go deeper, the
 This blowing up mechanism is done with the help of **transpose convolutions**.
 
 ## Transpose Convolutions
+
+This is the main part of the U-Net architecture responsible for blowing up lower dimensional convolutions to higher dimensional ones.
+
+Consider the example we are already familiar with, the normal convolution
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/RGBConv1.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+
+Where a $$6 \times 6 \times 3$$ image is convolved with five $$3 \times 3 \times 3$$ filters to get a $$4 \times 4 \times 5$$ output.
+
+A transpose convolution is different from this.
+
+Here we can take a smaller set of activations, say $$2 \times 2$$, convolve it with a $$3 \times 3$$ filter to get a $$4 \times 4$$ output.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/transConv1.png" class="img-fluid rounded z-depth-1" %}
+    </div>
+</div>
+
+Consider the following
+
+$$
+\begin{bmatrix}2 & 1 \\ 3 & 2 \end{bmatrix} \xrightarrow{\begin{bmatrix}1 & 2 & 1 \\ 2 & 0 & 1 \\ 0 & 2 & 1 \end{bmatrix}} \begin{bmatrix}* & * & * & * \\ * & * & * & * \\ * & * & * & * \\ * & * & * & *\end{bmatrix}
+$$
+
+Here we use a padding $$p=1$$ on the output and a stride of $$s=2$$.
+
+$$
+\begin{bmatrix}2 & 1 \\ 3 & 2 \end{bmatrix}
+\xrightarrow{\begin{bmatrix}1 & 2 & 1 \\ 2 & 0 & 1 \\ 0 & 2 & 1 \end{bmatrix}}
+\begin{bmatrix}
+\colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & * & * & * & * & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & * & * & * & * & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & * & * & * & * & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & * & * & * & * & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ }& \colorbox{grey}{ }
+\end{bmatrix}
+$$
+
+The main difference here is that, in contrast to the filter being placed on the input, multiplied and summed up; we place the filter on the output
+
+So, taking the number $$2$$ and multiplying it with every value in the filter, we get the output of the upper left corner of $$3 \times 3$$ pixels.
+
+$$
+\begin{bmatrix}\colorbox{red}{2} & 1 \\ 3 & 2 \end{bmatrix}
+\xrightarrow{\begin{bmatrix}1^2 & 2^2 & 1^2 \\ 2^2 & 0^2 & 1^2 \\ 0^2 & 2^2 & 1^2 \end{bmatrix}}
+\begin{bmatrix}
+\colorbox{red}{ } & \colorbox{red}{ } & \colorbox{red}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } \\
+\colorbox{red}{ } & \colorbox{red}{*} & \colorbox{red}{*} & * & * & \colorbox{grey}{ } \\
+\colorbox{red}{ } & \colorbox{red}{*} & \colorbox{red}{*} & * & * & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & * & * & * & * & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & * & * & * & * & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ }& \colorbox{grey}{ }
+\end{bmatrix}
+$$
+
+Here the padding area is ignored and only the values for the $$2 \times 2$$ region is filled with the convolution region as shown
+
+$$
+\begin{bmatrix}\colorbox{red}{2} & 1 \\ 3 & 2 \end{bmatrix}
+\xrightarrow{\begin{bmatrix}1^2 & 2^2 & 1^2 \\ 2^2 & \colorbox{red}{0^2} & \colorbox{red}{1^2} \\ 0^2 & \colorbox{red}{2^2} & \colorbox{red}{1^2} \end{bmatrix}}
+\begin{bmatrix}
+\colorbox{grey}{X} & \colorbox{grey}{X} & \colorbox{grey}{X} & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } \\
+\colorbox{grey}{X} & \colorbox{red}{0} & \colorbox{red}{2} & * & * & \colorbox{grey}{ } \\
+\colorbox{grey}{X} & \colorbox{red}{4} & \colorbox{red}{2} & * & * & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & * & * & * & * & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & * & * & * & * & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ }& \colorbox{grey}{ }
+\end{bmatrix}
+$$
+
+Similarly, for the second element, we face an overlap with the values from the first part. In this case, we add up the values
+
+$$
+\begin{bmatrix}2 & \colorbox{blue}1 \\ 3 & 2 \end{bmatrix}
+\xrightarrow{\begin{bmatrix}1^1 & 2^1 & 1^1 \\ \colorbox{blue}{2^1} & \colorbox{blue}{0^1} & \colorbox{blue}{1^1} \\ \colorbox{blue}{0^1} & \colorbox{blue}{2^1} & \colorbox{blue}{1^1} \end{bmatrix}}
+\begin{bmatrix}
+\colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{X} & \colorbox{grey}{X} & \colorbox{grey}{X} & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & 0 & \colorbox{red}{2}+\colorbox{blue}{2} & \colorbox{blue}{0} & \colorbox{blue}{1} & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & 4 & \colorbox{red}{2}+\colorbox{blue}{0} & \colorbox{blue}{2} & \colorbox{blue}{1} & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & * & * & * & * & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & * & * & * & * & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ }& \colorbox{grey}{ }
+\end{bmatrix}
+$$
+
+Repeating this for the remaining values following the same process and adding up the values obtained, we get the final result as follows
+
+$$
+\begin{bmatrix}2 & 1 \\ 3 & 2 \end{bmatrix}
+\xrightarrow{\begin{bmatrix}1 & 2 & 1 \\ 2 & 0 & 1 \\ 0 & 2 & 1 \end{bmatrix}}
+\begin{bmatrix}
+\colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & 0 & 4 & 0 & 1 & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & 10 & 7 & 6 & 3 & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & 0 & 7 & 0 & 2 & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & 6 & 3 & 4 & 2 & \colorbox{grey}{ } \\
+\colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ }& \colorbox{grey}{ }
+\end{bmatrix}
+$$
