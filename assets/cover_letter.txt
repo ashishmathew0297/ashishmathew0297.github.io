@@ -1,0 +1,24 @@
+Ashish Thomas Mathew
+ashishmathew2002@gmail.com
+(774) 365-8188
+January 31, 2025
+
+Samsung Research America
+Mountain View, CA
+
+Dear Hiring Manager,
+
+I am writing to express my interest in the AI/ML Engineering Intern position at Samsung Research America's Immersive Experience (IMEX) team. Currently, I am pursuing a Master of Science in Data Science at the University of Massachusetts Dartmouth, with an anticipated graduation in May 2025. My career objective is to leverage advanced machine learning and deep learning techniques to develop innovative solutions that enhance user experiences in augmented reality applications.
+
+In my role as a Teaching Assistant for High-Performance Computing, I have guided students in utilizing tools such as MPI and OpenMP, deepening my understanding of parallel programming and its applications in optimizing machine learning models. Additionally, during my tenure as a Systems Engineer at Tata Consultancy Services, I designed AI-powered web applications and microservices, ensuring scalability and reliability for enterprise use cases. This experience honed my skills in developing and fine-tuning models, as well as implementing and optimizing CI/CD pipelines, reducing deployment speeds by 80%.
+
+I am proficient in Python and have hands-on experience with deep learning frameworks like PyTorch. My projects include developing image recognition systems with over 95% accuracy and experimenting with various optimization algorithms to elucidate convergence patterns on non-convex spaces. These endeavors have strengthened my command of algorithms and data structures, aligning with the requirements of the AI/ML Engineering Intern role.
+
+Samsung's mission to create superior products and services for a better global society resonates deeply with me. The IMEX team's focus on next-generation augmented reality use cases and machine learning platforms for AREmoji and other 3D characters is particularly compelling to me, and I am inspired by Samsung's commitment to innovation and its collaborative environment that bridges industry and academia.
+
+I am enthusiastic about the opportunity to contribute to Samsung's pioneering work in generative AI technology. I am confident that my background in machine learning, deep learning, and software development positions me to make meaningful contributions to your team. I look forward to the possibility of discussing how my skills and experiences align with Samsung's goals.
+
+Thank you for considering my application.
+
+Sincerely,
+Ashish Thomas Mathew

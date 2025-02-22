@@ -38,7 +38,7 @@ Taking the upper left corner of the image as $$(0,0)$$ and the botton right as $
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/cat_bounding_box.jpg" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/cat_bounding_box.jpg" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 <div class="caption">
@@ -268,7 +268,7 @@ Since this is convolutionally applied, the computations here are fairly quick, w
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/grid_cat.jpg" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/grid_cat.jpg" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 <div class="caption">
@@ -297,7 +297,7 @@ Consider the image below with the green box being the ground truth bounding box 
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/cat_iou.jpg" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/cat_iou.jpg" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 <div class="caption">
@@ -320,7 +320,7 @@ Putting this in terms of sets makes it a bit easier to understand. Refer to the 
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/set_example.jpg" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/set_example.jpg" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 
@@ -336,7 +336,7 @@ Considering the image below, despite the center point lying inside a grid square
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/non_max_eg1.jpg" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/non_max_eg1.jpg" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 
@@ -376,7 +376,7 @@ Consider the image below where we have the bounding boxes for a dog and couch.
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/doge_anchor.jpg" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/doge_anchor.jpg" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 
@@ -402,7 +402,7 @@ Where each following set of outputs is related to an anchor box. So if we had bo
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/anchor_boxes.jpg" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/anchor_boxes.jpg" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 
@@ -438,7 +438,7 @@ Typing up all the concepts we discussed before, we can now study how the YOLO al
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/yolo_1.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/yolo_1.png" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 <div class="caption">
@@ -508,7 +508,7 @@ Segmentation outlines the object to know which pixels _exactly_ belong to the ob
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/semseg_eg.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/semseg_eg.png" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 <div class="caption">
@@ -525,7 +525,7 @@ Consider the given image where we want to segment out the woman who's angry at s
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/angry_woman.jpg" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/angry_woman.jpg" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 
@@ -533,7 +533,7 @@ Here we would have two class labels, 1 for the woman and 0 for nothing. Below, I
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/angry_woman_1.jpg" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/angry_woman_1.jpg" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 
@@ -549,7 +549,7 @@ Consider the CNN below
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/CNN_UNet.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/CNN_UNet.png" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 
@@ -563,7 +563,7 @@ The architecture will represent something like below where, as we go deeper, the
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/CNN_UNet_2.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/CNN_UNet_2.png" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 
@@ -577,7 +577,7 @@ Consider the example we are already familiar with, the normal convolution
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/RGBConv1.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/RGBConv1.png" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 
@@ -589,7 +589,7 @@ Here we can take a smaller set of activations, say $$2 \times 2$$, convolve it w
 
 <div class="row justify-content-center mt-3">
     <div class="col-9 mt-3 mt-md-0">
-        {% include figure.liquid loading="eager" path="assets/img/transConv1.png" class="img-fluid rounded z-depth-1" %}
+        {% include figure.liquid loading="eager" path="assets/img/transConv1.png" class="img-fluid rounded z-depth-1" zoomable=true%}
     </div>
 </div>
 
@@ -675,3 +675,44 @@ $$
 \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ } & \colorbox{grey}{ }& \colorbox{grey}{ }
 \end{bmatrix}
 $$
+
+## U-Net Intuition
+
+The architecture is rougly as follows
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/CNN_UNet_2.png" class="img-fluid rounded z-depth-1" zoomable=true%}
+    </div>
+</div>
+
+The first part of the network is composed of normal convolutions which compresses the image, and the second half uses transpose convolutions to bring the size back up to the original size of the image.
+
+The main change made to the above that converts it into a U-Net is skip connections add from earlier blocks to later blocks. The reasons for this are:
+
+- We need high level spatial information which we can get from the **previous layer** from which the NN may have figured out that there is an object at a certain part of the image
+- The original input here has a very low spatial resolution. We need detailed, fine-grained spatial information. The **skip connection** allows us to send the high-resolution low level feature information to the corresponding layer in the network
+
+## U-Net Architecture
+
+The U-Net is one of the most important models today. The image below shows an example of a U-Net from the original paper.
+
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/UNET.png" class="img-fluid rounded z-depth-1" zoomable=true%}
+    </div>
+</div>
+
+In the above image, instead of visualizing the image and the subsequent layers in 3D, they are instead represented with lines of varying width. This makes it a bit easier to visualize stuff since we already have an idea of how our inputs and outputs look and how the convolutions act upon them.
+
+The given image is pretty self explanatory where:
+- Each black arrow represents a convolution operation on the inputs
+- Red arrows represent pooling layers that reduce the dimension of the inputs
+- Green arrows represent transpose convolutions
+- White arrows represent skip connections sending information from the corresponding lower layers.
+
+The output we obtain here is a $$h \times w \times n_{\text{classes}}$$ output corresponding to the dimensions of our input and each layer corresponding to bounding boxes for our classes.
+
+# Conclusion
+
+This, rather short blog covers a few basic object detection concepts along with two fairly relevant object detection models: YOLO and U-Nets. Both these models find several use cases in the modern day, especially YOLO with continuous developments happening on the daily. I would be interested to implement these in various use cases as well as build them up from scratch to see how they work.
