@@ -688,6 +688,12 @@ The architecture is rougly as follows
 
 The first part of the network is composed of normal convolutions which compresses the image, and the second half uses transpose convolutions to bring the size back up to the original size of the image.
 
+<div class="row justify-content-center mt-3">
+    <div class="col-9 mt-3 mt-md-0">
+        {% include figure.liquid loading="eager" path="assets/img/UNET_0.png" class="img-fluid rounded z-depth-1" zoomable=true%}
+    </div>
+</div>
+
 The main change made to the above that converts it into a U-Net is skip connections add from earlier blocks to later blocks. The reasons for this are:
 
 - We need high level spatial information which we can get from the **previous layer** from which the NN may have figured out that there is an object at a certain part of the image
@@ -711,7 +717,7 @@ The given image is pretty self explanatory where:
 - Green arrows represent transpose convolutions
 - White arrows represent skip connections sending information from the corresponding lower layers.
 
-The output we obtain here is a $$h \times w \times n_{\text{classes}}$$ output corresponding to the dimensions of our input and each layer corresponding to bounding boxes for our classes.
+We obtain a $$h \times w \times n_{\text{classes}}$$ output corresponding to the dimensions of our input and each layer corresponding to bounding boxes for our classes.
 
 # Conclusion
 
